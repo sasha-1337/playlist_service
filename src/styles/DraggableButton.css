@@ -1,0 +1,20 @@
+﻿.draggable-button {
+    transition: box-shadow 0.2s ease;
+    user-select: none;
+    background: none;
+    border: none;
+    outline: none;
+    border-radius: 50%;
+    box-sizing: border-box;
+}
+
+     /*При наведенні — тільки тінь, без додаткового transform */
+    .draggable-button:hover {
+        box-shadow: 0 0 150px rgba(0, 0, 0, 0.9);
+    }
+
+     /*Під час перетягування */
+    .draggable-button.dragging {
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        cursor: grabbing;
+    }

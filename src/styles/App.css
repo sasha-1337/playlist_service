@@ -1,0 +1,751 @@
+.test-models-search-btn {
+    cursor: pointer;
+    width: 150px;
+    height: 100px;
+    line-height: 40px;
+    color: white;
+    font-size: 18px;
+    background-color: rgba(0, 0, 0, 0.9);
+    border: 2px solid rgba(255,255,255,0.5);
+    border-radius: 20%;
+    float: left;
+    transition: all 0.5s;
+}
+    .test-models-search-btn:hover {
+        font-size: 20px;
+        box-shadow: 0 0 50px 50px rgba(255,255,255,0.2) inset, 0 0 25px 5px rgba(255,255,255,0.8);
+        border: 3px solid rgba(255,255,255,1);
+        color: rgba(255,255,255,1);
+    }
+
+.ai-search-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    width: 100px;
+    height: 100px;
+    color: white;
+    font-size: 18px;
+    background-color: rgba(0, 0, 0, 0.9);
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    transition: all 0.6s ease;
+    overflow: hidden;
+    position: relative;
+}
+
+    /* --- Ефект при наведенні --- */
+    .ai-search-btn:hover {
+        width: 200px;
+        border-radius: 50px;
+        box-shadow: 0 0 25px 5px rgba(255,255,255,0.8);
+        border: 3px solid rgba(255, 255, 255, 1);
+    }
+
+/* --- Іконк--- */
+.ai-search-icon {
+    width: 50px;
+    height: 50px;
+    transition: transform 0.6s ease;
+    flex-shrink: 0;
+}
+
+/* При наведенні рухаємо іконку трохи вправо */
+.ai-search-btn:hover .ai-search-icon {
+    transform: translateX(40px);
+}
+
+/* --- Текст "АІ Пошук" --- */
+.ai-search-text {
+    opacity: 0;
+    transform: translateX(-20px);
+    white-space: nowrap;
+    transition: all 0.5s ease;
+    font-weight: 500;
+    position: absolute;
+    left: 25px;
+}
+
+/* Плавно з’являється при наведенні */
+.ai-search-btn:hover .ai-search-text {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Overlay для модальних вікон (опціонально) */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 999;
+    backdrop-filter: blur(2px);
+}
+
+/* Анімація появи модальних вікон */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+
+/*/////////////////////////////////*/
+.main-content {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 20px;
+}
+
+.container {
+    padding: 0 20px 0 20px;
+    width: 30%;
+    position: relative;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-content: center;
+}
+
+.showtext-container {
+    flex-basis: 70%;
+    height: 900px;
+}
+
+.button-group {
+    position: relative;
+    display: flex;
+    justify-content: space-evenly;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: nowrap;
+    width: 100%;
+    grid-row-gap: 10px;
+    margin-bottom: 20px;
+}
+
+.add-button {
+    position: relative;
+    width: 200px;
+    height: 100px;
+    background-color: #000;
+    color: white;
+    border: 3px solid white;
+    cursor: pointer;
+    font-size: 18px;
+    transition: border-width 0.1s, font-size 0.3s, transform 0.2s;
+}
+
+    .add-button:hover {
+        border-width: 4px;
+        font-size: 20px;
+        transform: scale(1.05);
+    }
+
+.select {
+    position: relative;
+    width: 200px;
+    height: 100px;
+    border: 3px solid white;
+    background-color: black;
+    font-size: 18px;
+    color: white;
+    cursor: pointer;
+    text-align: center;
+    transition: width 0.3s, font-size 0.3s, border-width 0.1s, transform 0.2s;
+}
+
+    .select:hover {
+        width: 200px;
+        border-width: 4px;
+        font-size: 20px;
+        transform: scale(1.05);
+    }
+
+.content-container {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+/* Works on Firefox */
+.content-scrollbar {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    flex-wrap: nowrap;
+    overflow-y: scroll;
+    max-height: 770px;
+    scrollbar-width: thin;
+    scrollbar-color: white transparent;
+}
+
+    .content-scrollbar::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .content-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .content-scrollbar::-webkit-scrollbar-thumb {
+        background: #fff;
+        border-radius: 4px;
+    }
+
+.album-container, .single-container {
+    margin-bottom: 5px;
+    position: relative;
+}
+
+.album-header, .single-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    width: 600px;
+    height: 150px;
+    border: 5px solid rgba(255,255,255,0.5);
+    z-index: 2;
+    transition: border 0.1s;
+}
+
+    .album-header:hover, .single-header:hover {
+        border: 8px solid rgba(255,255,255,1);
+    }
+
+    .album-header .background-image,
+    .single-header .background-image,
+    .song .background-image {
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        filter: blur(2px);
+        z-index: 0;
+    }
+
+    .album-header .overlay,
+    .single-header .overlay,
+    .song .overlay {
+        background-color: rgba(0, 0, 0, 0.3);
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+    }
+
+    .album-header .content,
+    .single-header .content,
+    .song .content {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px;
+        color: white;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+        z-index: 2;
+        transition: box-shadow 0.5s, color 0.1s;
+    }
+
+        .album-header .content:hover, .single-header .content:hover {
+            box-shadow: 0 0 40px rgba(255,255,255,0.7) inset;
+            color: rgba(255,255,255,1);
+        }
+
+.album-info, .single-info {
+    flex: 1;
+}
+
+.album-name, .single-name {
+    font-size: 22px;
+    color: rgba(255,255,255, 0.7);
+    font-weight: bold;
+    justify-content: center;
+    transition: color 0.1s;
+}
+
+.album-header:hover .album-name {
+    color: rgba(255,255,255, 1);
+}
+
+.album-header.active .album-name {
+    color: rgba(255,255,255, 1);
+}
+
+.single-header:hover .single-name {
+    color: rgba(255,255,255, 1);
+}
+
+.album-description {
+    font-size: 14px;
+    color: #666;
+}
+
+.remove-icon, .edit-icon, .add-icon {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Контейнер для кнопок */
+.action-buttons {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 3;
+    overflow: hidden;
+}
+
+/* Стилі для кнопок */
+.action-button {
+    width: 35px;
+    height: 30px;
+    border: 1px solid #000;
+    border-radius: 10%;
+    background-color: white;
+    color: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: bold;
+    opacity: 0;
+    transform: translateX(50px);
+    transition: opacity 0.3s, transform 0.3s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+    .action-button:hover {
+        color: white;
+        border-color: white;
+        background-color: rgba(0, 0, 0, 0.3);
+    }
+    /* Різні затримки для послідовної появи */
+    .action-button:nth-child(1) {
+        transition-delay: 0s;
+    }
+
+    .action-button:nth-child(2) {
+        transition-delay: 0.1s;
+    }
+
+    .action-button:nth-child(3) {
+        transition-delay: 0.2s;
+    }
+
+/* Показувати кнопки при наведенні на контейнер */
+.single-header:hover .action-button {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.album-header:hover .action-button {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.song-list {
+    position: relative;
+    margin-top: 5px;
+}
+
+.song {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    float: left;
+    margin-bottom: 5px;
+    width: 500px;
+    height: 80px;
+    border: 3px solid rgba(255,255,255,0.5);
+    cursor: pointer;
+    z-index: 2;
+    transition: border 0.1s, color 0.1s;
+}
+
+    .song:hover {
+        border: 5px solid rgba(255,255,255,1);
+        color: rgba(255,255,255,1);
+    }
+
+.song-name {
+    position: absolute;
+    top: 20px;
+    left: 10px;
+    justify-content: center;
+    font-size: 20px;
+    margin-bottom: 5px;
+    color: rgba(255,255,255, 0.7);
+}
+
+.song:hover .song-name {
+    color: rgba(255,255,255, 1);
+}
+
+.song:hover .action-button {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.song.active .song-name {
+    color: rgba(255,255,255, 1);
+}
+
+.selected-song {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #000;
+    border-radius: 4px;
+    background-color: #f5f5f5;
+}
+
+/*/////////////////////////////////*/
+/*.main-content {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 20px;
+}
+
+.container {*/
+    /*width: 30% auto;*/
+    /*height: 1000px;*/
+    /*padding: 0 20px 0 20px;
+    width: 100%;
+    position: relative;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-content: center;
+}
+
+.button-group {
+    position: relative;
+    display: flex;
+    justify-content: space-evenly;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: nowrap;
+    width: 100%;
+    grid-row-gap: 10px;
+    margin-bottom: 20px;
+}
+
+.add-button {
+    position: relative;
+    width: 200px;
+    height: 100px;
+    background-color: #000;
+    color: white;
+    border: 3px solid white;
+    cursor: pointer;
+    font-size: 18px;
+    transition: border-width 0.1s, font-size 0.3s, transform 0.2s;
+}
+    .add-button:hover {
+        
+        border-width: 4px;
+        font-size: 20px;
+        transform: scale(1.05);
+    }
+
+.select {
+    position: relative;
+    width: 200px;
+    height: 100px;
+    border: 3px solid white;
+    background-color: black;
+    font-size: 18px;
+    color: white;
+    cursor: pointer;
+    text-align: center;
+    transition: width 0.3s, font-size 0.3s, border-width 0.1s, transform 0.2s;
+}
+    .select:hover {
+        width: 200px;
+        border-width: 4px;
+        font-size: 20px;
+        transform: scale(1.05);
+    }
+
+.content-container {
+    position: relative;
+    width: 100%;*/
+    /*height: 770px;*/
+    /*padding-right: 20px;*/
+    /*display: flex;
+    justify-content: center;
+}*/
+
+/* Works on Firefox */
+/*.content-scrollbar {
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    flex-wrap: nowrap;
+    
+
+    overflow-y: scroll;
+    max-height: 770px;
+    scrollbar-width: thin;
+    scrollbar-color: white transparent;
+}
+
+    .content-scrollbar::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .content-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .content-scrollbar::-webkit-scrollbar-thumb {
+        background: #fff;
+        border-radius: 4px;
+    }
+
+.album-container, .single-container {
+    margin-bottom: 5px;
+    position: relative;
+}
+
+.album-header, .single-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    width: 600px;
+    height: 150px;
+    border: 5px solid rgba(255,255,255,0.5);
+    z-index: 2;
+    transition: border 0.1s;
+}
+    .album-header:hover, .single-header:hover {
+        border: 8px solid rgba(255,255,255,1);
+    }
+    .album-header .background-image, 
+    .single-header .background-image,
+    .song .background-image
+    {
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        filter: blur(2px);
+        z-index: 0;
+    }
+
+    .album-header .overlay,
+    .single-header .overlay,
+    .song .overlay 
+    {
+        background-color: rgba(0, 0, 0, 0.3);
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+    }
+
+    .album-header .content,
+    .single-header .content,
+    .song .content {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px;
+        color: white;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+        z-index: 2;
+        transition: box-shadow 0.5s, color 0.1s;
+    }
+        .album-header .content:hover, .single-header .content:hover {
+            box-shadow: 0 0 40px rgba(255,255,255,0.7) inset;
+            color: rgba(255,255,255,1);
+        }
+
+.album-info, .single-info {
+    flex: 1;
+}
+
+.album-name, .single-name {
+    font-size: 22px;
+    color: rgba(255,255,255, 0.7);
+    font-weight: bold;
+    justify-content: center;
+    transition: color 0.1s;
+}
+
+.album-header:hover .album-name {
+    color: rgba(255,255,255, 1);
+}
+.album-header.active .album-name {
+    color: rgba(255,255,255, 1);
+}
+
+.single-header:hover .single-name {
+    color: rgba(255,255,255, 1);
+}
+
+.album-description {
+    font-size: 14px;
+    color: #666;
+}
+
+.remove-icon, .edit-icon, .add-icon {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}*/
+
+/* Контейнер для кнопок */
+/*.action-buttons {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 3;
+    overflow: hidden;
+}*/
+
+/* Стилі для кнопок */
+/*.action-button {
+    width: 35px;
+    height: 30px;
+    border: 1px solid #000;
+    border-radius: 10%;
+    background-color: white;
+    color: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: bold;
+    opacity: 0;
+    transform: translateX(50px);
+    transition: opacity 0.3s, transform 0.3s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+
+}
+    .action-button:hover {
+        color: white;
+        border-color: white;
+        background-color: rgba(0, 0, 0, 0.3);
+    }*/
+    /* Різні затримки для послідовної появи */
+    /*.action-button:nth-child(1) {
+        transition-delay: 0s;
+    }
+
+    .action-button:nth-child(2) {
+        transition-delay: 0.1s;
+    }
+
+    .action-button:nth-child(3) {
+        transition-delay: 0.2s;
+    }*/
+
+/* Показувати кнопки при наведенні на контейнер */
+/*.single-header:hover .action-button {
+    opacity: 1;
+    transform: translateX(0);
+}
+.album-header:hover .action-button {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.song-list {
+    position: relative;
+    margin-top: 5px;
+}
+
+.song {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    float: left;
+    margin-bottom: 5px;
+    width: 500px;
+    height: 80px;
+    border: 3px solid rgba(255,255,255,0.5);
+    cursor: pointer;
+    z-index: 2;
+    transition: border 0.1s, color 0.1s;
+}
+    .song:hover {
+        border: 5px solid rgba(255,255,255,1);
+        color: rgba(255,255,255,1);
+    }
+
+.song-name {
+    position: absolute;
+    top: 20px;
+    justify-content: center;
+    font-size: 20px;
+    margin-bottom: 5px;
+    color: rgba(255,255,255, 0.7);
+}
+.song:hover .song-name {
+    color: rgba(255,255,255, 1);
+}
+
+.song:hover .action-button {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+
+.song.active .song-name {
+    color: rgba(255,255,255, 1);
+}
+
+.selected-song {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #000;
+    border-radius: 4px;
+    background-color: #f5f5f5;
+}*/

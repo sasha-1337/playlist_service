@@ -1,0 +1,231 @@
+﻿/* Модальне перекриття */
+/*.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease-in-out;
+}*/
+
+/* Вміст модального вікна */
+/*.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 400px;
+    animation: slideIn 0.3s ease-in-out;
+}*/
+
+/* Форма */
+/*.form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}*/
+
+/* Поля вводу */
+/*.input {
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #000;
+    border-radius: 4px;
+}
+
+.textarea {
+    min-height: 100px;
+    resize: vertical;
+}*/
+
+/* Група кнопок */
+/*.button-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}*/
+
+/* Базова кнопка */
+/*.button {
+    padding: 8px 16px;
+    background-color: white;
+    border: 1px solid #000;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+    .button:hover {
+        background-color: #f0f0f0;
+        transform: scale(1.05);
+    }
+
+.save-button {
+    background-color: #000;
+    color: #fff;
+    padding: 8px 16px;
+    border: 1px solid #000;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+    .save-button:hover {*/
+        /* background-color: #444;*/
+        /*background-color: #fff;
+        color: #000;
+        transform: scale(1.05);
+    }*/
+
+/* Анімації */
+/*@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.crop-container {
+
+}*/
+
+.modal-overlay-crop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.modal-content-crop {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.form-crop {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+    .form-crop h2 {
+        margin: 0;
+        color: #000;
+        font-size: 1.5rem;
+        font-weight: 600;
+        text-align: center;
+    }
+
+.input-crop {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+}
+
+    .input-crop:focus {
+        outline: none;
+        border-color: #000;
+    }
+
+.textarea-crop {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.button-crop {
+    padding: 0.8rem 1.5rem;
+    background: #fff;
+    border: 1px solid #000;
+    border-radius: 4px;
+    color: #000;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+    .button-crop:hover {
+        background: #000;
+        color: #fff;
+    }
+
+.save-button-crop {
+    padding: 0.8rem 1.5rem;
+    background: #000;
+    border: 1px solid #000;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+    .save-button-crop:hover {
+        background: #333;
+    }
+
+    .save-button-crop:disabled {
+        background: #ccc;
+        border-color: #ccc;
+        cursor: not-allowed;
+    }
+
+.button-group-crop {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.crop-container {
+    margin: 1.5rem 0;
+    max-width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+input-crop[type="file"] {
+    border: 1px dashed #ccc;
+    padding: 1rem;
+    cursor: pointer;
+}
+
+input-crop[type="file"]:hover {
+    border-color: #000;
+}

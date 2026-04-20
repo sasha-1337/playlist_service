@@ -1,0 +1,198 @@
+﻿/*.container {
+    width: 600px;
+    height: 900px;
+    margin: 20px auto;
+    position: relative;
+    float: left;
+    border: 3px white;
+
+}
+
+button {
+    width: 50%;
+    padding: 10px 20px;
+    margin-bottom: 10px;
+    background-color: transparent;
+    color: white;
+    backdrop-filter: blur(1px);
+    border: 3px solid white;
+    font-size: larger;
+    cursor: pointer;
+}
+
+    button:hover {
+        background-color: white;
+        caret-color: pink;
+        color: black;
+    }
+
+.album {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 20px;
+    background-color: white;
+}
+
+.album-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.song-list {
+    border: 5px solid white;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.song {
+    margin-top: 10px;
+    padding: 5px;
+    border-bottom: 1px solid #ccc;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: block;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    width: 400px;
+}
+*/
+/*.container {
+    width: 600px;
+    height: 900px;
+    margin: 20px auto;
+    position: relative;
+    float: left;
+    border-color: white;
+    background-color: white;
+}
+
+.container button {
+    width: 50%;
+    padding: 10px 20px;
+    margin-bottom: 10px;
+    background-color: #000;
+    color: #fff;
+    border: 1px solid #fff;
+    border-radius: 0px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+    .container button:hover {
+        background-color: #000;
+        color: #fff;
+    }
+
+.album button {
+    padding: 10px 20px;
+    margin-bottom: 10px;
+    background-color: #000;
+    color: #fff;
+    border: 1px solid #000;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+    .container button:hover {
+        background-color: #fff;
+        color: #000;
+    }
+.album-list {
+    
+    margin-top: 10px;
+    padding-left: 20px;
+}
+.album {
+    /* border: 1px solid #000;
+    display: block;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 20px;
+    background-color: #fff;
+}
+
+.album-header {
+    display: block;
+}
+
+    .album-header h4 {
+        margin: 0;
+        color: #000;
+    }
+.album-header button {
+    float: right;
+    display: flex;
+}
+
+.song-list {
+    margin-top: 10px;
+    padding-left: 20px;
+}
+
+.song {
+    margin-top: 10px;
+    padding: 5px;
+    border-bottom: 1px solid #000;
+    color: #000;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    width: 400px;
+    color: #000;
+}
+
+input[type="text"],
+textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #000;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    color: #000;
+}
+
+    input[type="text"]::placeholder,
+    textarea::placeholder {
+        color: #666;
+    }
+
+input[type="file"] {
+    margin-bottom: 10px;
+}
+
+.hidden {
+    display: none;
+}
+    */
