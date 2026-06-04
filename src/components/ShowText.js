@@ -1,7 +1,9 @@
-﻿import React from "react";
+﻿import React, { useState } from "react";
 import styles from "../styles/ShowText.module.css";
 
 function ShowText({ selectedSingle, selectedAlbum, selectedSong }) {
+
+    const [activeTab, setActiveTab] = useState("lyrics");
 
     const isSong = !!selectedSong;
     const isSingle = !!selectedSingle;
@@ -33,9 +35,7 @@ function ShowText({ selectedSingle, selectedAlbum, selectedSong }) {
 
     const name = activeItem?.name || "Без назви";
     const lyrics = activeItem?.lyrics || "";
-    //const description = activeItem?.description || (isAlbum ? selectedAlbum?.description : "") || "Опис відсутній";
 
-    // Універсальна функція для форматування тексту з переносами
     const formatText = (text) => {
         if (!text) return "Немає даних";
         return text.split("\n").map((line, index) => (
@@ -46,189 +46,104 @@ function ShowText({ selectedSingle, selectedAlbum, selectedSong }) {
         ));
     };
 
+    const lyricsPlaceholder = isAlbum ? "Тут можуть відображатись пісні вашого альбому."
+        : isSingle ? "Тут може бути текст вашого синглу."
+            : isSong ? "Тут може бути текст вашої пісні."
+                : "Оберіть елемент, щоб переглянути текст.";
+
+    const descTitle = isAlbum ? "Опис альбому"
+        : isSingle ? "Опис синглу"
+            : isSong ? "Опис пісні"
+                : "Опис";
+
+    // ── Вміст для lyrics панелі ──
+    const lyricsContent = (
+        <>
+            <h3 style={{ marginBottom: "20px", textAlign: "center" }}>{name}</h3>
+            <div className={styles.textBlock}>
+                {lyrics ? formatText(lyrics) : formatText(lyricsPlaceholder)}
+            </div>
+        </>
+    );
+
+    // ── Вміст для description панелі ──
+    const descContent = (
+        <>
+            <h3 style={{ marginBottom: "15px" }}>{descTitle}</h3>
+            <div className={styles.textBlock}>
+                <p><strong>Автор:</strong> {creator}</p>
+                <p><strong>Жанр:</strong>  {genre}</p>
+
+                {isSong && (
+                    <>
+                        <p style={{ marginTop: "15px", fontWeight: "bold" }}>Опис альбому:</p>
+                        {formatText(description)}
+                    </>
+                )}
+
+                {(isSingle || isAlbum) && (
+                    <p style={{ marginTop: "15px" }}>{formatText(description)}</p>
+                )}
+
+                {!activeItem && (
+                    <p style={{ marginTop: "15px", opacity: 0.6 }}>
+                        Оберіть пісню, альбом або сингл для перегляду деталей
+                    </p>
+                )}
+            </div>
+        </>
+    );
+
     return (
         <div className={styles.commonContainer}>
-            {/* Ліва частина — текст/тексти */}
+
+            {/* ── DESKTOP: дві колонки ── */}
             <div className={styles.lyricsContainer}>
                 <div className={styles.lyrics}>
                     <div className={styles.scrollContent}>
-                        <h3 style={{ marginBottom: "20px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                            {name}
-                        </h3>
-
-                        <div className={styles.textBlock}>
-                            {lyrics
-                                ? formatText(lyrics)
-                                : formatText(
-                                    isAlbum
-                                        ? "Тут можуть відображатись пісні вашого альбому."
-                                        : isSingle
-                                            ? "Тут може бути текст вашого синглу."
-                                            : isSong
-                                                ? "Тут може бути текст вашої пісні."
-                                                : "Оберіть елемент, щоб переглянути текст."
-                                )}
-                        </div>
+                        {lyricsContent}
                     </div>
                 </div>
             </div>
 
-            {/* Права частина — опис і обкладинка */}
             <div className={styles.descriptionContainer}>
                 <div className={styles.description}>
                     <div className={styles.scrollContent}>
-                        <h3 style={{ marginBottom: "15px" }}>
-                            {isAlbum
-                                ? "Опис альбому"
-                                : isSingle
-                                    ? "Опис синглу"
-                                    : isSong
-                                        ? "Опис пісні"
-                                        : "Опис"}
-                        </h3>
-
-                        <div className={styles.textBlock}>
-                            <p><strong>Автор:</strong> {creator}</p>
-                            <p><strong>Жанр:</strong> {genre}</p>
-
-                            {/* Для пісні показуємо опис альбому */}
-                            {isSong  && (
-                                <>
-                                    <p style={{ marginTop: "15px", fontWeight: "bold" }}>
-                                        Опис альбому:
-                                    </p>
-                                    {formatText(description)}
-                                </>
-                            )}
-
-                            {/* Для синглу і альбому показуємо їхній опис */}
-                            {(isSingle || isAlbum) && (
-                                <>
-                                    <p style={{ marginTop: "15px" }}>
-                                        {formatText(description)}
-                                    </p>
-                                </>
-                            )}
-
-                            {/* Якщо нічого не вибрано */}
-                            {!activeItem && (
-                                <p style={{ marginTop: "15px", opacity: 0.6 }}>
-                                    Оберіть пісню, альбом або сингл для перегляду деталей
-                                </p>
-                            )}
-                        </div>
+                        {descContent}
                     </div>
                 </div>
             </div>
+
+            {/* ── MOBILE: tab bar + panels ── */}
+            <div className={styles.tabBar}>
+                <button
+                    className={`${styles.tabButton} ${activeTab === "lyrics" ? styles.tabActive : ""}`}
+                    onClick={() => setActiveTab("lyrics")}
+                >
+                    🎵 Текст
+                </button>
+                <button
+                    className={`${styles.tabButton} ${activeTab === "info" ? styles.tabActive : ""}`}
+                    onClick={() => setActiveTab("info")}
+                >
+                    ℹ️ Інфо
+                </button>
+            </div>
+
+            <div className={`${styles.tabPanel} ${styles.lyricsPanel} ${activeTab === "lyrics" ? styles.tabPanelActive : ""}`}>
+                <div className={styles.scrollContent}>
+                    {lyricsContent}
+                </div>
+            </div>
+
+            <div className={`${styles.tabPanel} ${styles.infoPanel} ${activeTab === "info" ? styles.tabPanelActive : ""}`}>
+                <div className={styles.scrollContent}>
+                    {descContent}
+                </div>
+            </div>
+
         </div>
     );
 }
 
 export default ShowText;
-//import React from "react";
-//import styles from "./styles/ShowText.module.css";
-
-//function ShowText({ selectedSingle, selectedAlbum, selectedSong }) {
-
-//    // Визначаємо активний елемент
-//    const activeItem = selectedSong || selectedSingle || selectedAlbum;
-//    const isSong = !!selectedSong;
-//    const isSingle = !!selectedSingle;
-//    const isAlbum = !!selectedAlbum && !selectedSong;
-
-//    // Витягуємо дані
-//    const creator = activeItem?.creator || "Невідомий виконавець";
-//    const name = activeItem?.name || "Без назви";
-//    const genre = activeItem?.genre || "Жанр не вказано";
-//    const lyrics = activeItem?.lyrics || "";
-//    const description = activeItem?.description || "Опис відсутній";
-
-//    // Виправлено обробку coverImage
-//    /*let coverImage = null;*/
-//    //if (activeItem?.coverImage) {
-//    //    // Якщо це вже повний URL
-//    //    if (activeItem.coverImage.startsWith('http')) {
-//    //        coverImage = activeItem.coverImage;
-//    //    } else {
-//    //        // Якщо це лише назва файлу
-//    //        coverImage = `http://localhost:5000/uploads/${activeItem.coverImage}`;
-//    //    }
-//    //}
-//    // Універсальна функція для форматування тексту з переносами
-
-//    const formatText = (text) => {
-//        if (!text) return "Немає даних";
-//        return text.split("\n").map((line, index) => (
-//            <React.Fragment key={index}>
-//                {line}
-//                <br />
-//            </React.Fragment>
-//        ));
-//    };
-
-//    return (
-//        <div className={styles.commonContainer}>
-//            {/* Ліва частина — текст/тексти */}
-//            <div className={styles.lyricsContainer}>
-//                <div className={styles.lyrics}>
-//                    <div className={styles.scrollContent}>
-//                        <h3 style={{ marginBottom: "20px", display:"flex", alignItems: "center", justifyContent: "center" }}>{name}</h3>
-//                        <div className={styles.textBlock}>
-//                            {lyrics
-//                                ? formatText(lyrics)
-//                                : formatText(
-//                                    isAlbum 
-//                                    ? "Тут може бути текст вашого альбому."
-//                                    : isSingle
-//                                        ? "Тут може бути текст вашого синглу."
-//                                        : isSong
-//                                            ? "Тут може бути текст вашої пісні."
-//                                            : "Оберіть елемент, щоб переглянути текст."
-//                                )}
-//                        </div>
-//                    </div>
-//                </div>
-//            </div>
-
-//            {/* Права частина — опис і обкладинка */}
-
-//            <div className={styles.descriptionContainer}>
-//                <div className={styles.description}>
-//                    <div className={styles.scrollContent}>
-//                        <h3 style={{ marginBottom: "15px" }}>
-//                            {isAlbum
-//                                ? "Опис альбому"
-//                                : isSingle
-//                                    ? "Опис синглу"
-//                                    : isAlbum
-//                                        ? "Опис пісні"
-//                                        : "Опис"}
-//                        </h3>
-
-//                        <div className={styles.textBlock}>
-//                            <p>Автор: {creator}</p>
-//                            <p>Жанр: {genre}</p>
-//                            {formatText(description)}
-//                        </div>
-
-//                        {/*{coverImage && (*/}
-//                        {/*    <img*/}
-//                        {/*        src={coverImage}*/}
-//                        {/*        alt="cover"*/}
-//                        {/*        style={{*/}
-//                        {/*            marginTop: "20px",*/}
-//                        {/*            width: "80%",*/}
-//                        {/*            borderRadius: "10px",*/}
-//                        {/*            boxShadow: "0 0 15px rgba(0,0,0,0.4)",*/}
-//                        {/*        }}*/}
-//                        {/*    />*/}
-//                        {/*)}*/}
-//                    </div>
-//                </div>
-//            </div>
-//        </div>
-
-//    );
-//}
-
-//export default ShowText;

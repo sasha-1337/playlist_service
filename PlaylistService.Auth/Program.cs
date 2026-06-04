@@ -3,8 +3,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using PlaylistService.Auth.Data;
-using PlaylistService.Auth.Models;
+using PlaylistService.Auth.EnvSettingModels;
+using PlaylistService.Auth.Services;
+using PlaylistService.Auth.Strategy;
 using PlayListService.Auth.Services;
+using PlayListService.Auth.Strategy;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
@@ -27,20 +30,32 @@ builder.Services.AddDbContext<AuthDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add services to the container.
+builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IAuthStrategy, RegisterStrategy>();
+builder.Services.AddScoped<IAuthStrategy, ChangePasswordStrategy>();
+builder.Services.AddScoped<IAuthStrategy, RemoveAccountStrategy>();
 
+// Configure .env variables mapping
 var googleSection = builder.Configuration.GetSection("Google");
-var googleSettings = googleSection.Get<GoogleSettings>();
 builder.Services.Configure<GoogleSettings>(googleSection);
 
 var jwtSection = builder.Configuration.GetSection("Jwt");
-var jwtSettings = jwtSection.Get<JwtSettings>();
 builder.Services.Configure<JwtSettings>(jwtSection);
+
+var jwtSettings = jwtSection.Get<JwtSettings>();
+
+if (jwtSettings == null || string.IsNullOrEmpty(jwtSettings.SecretKey))
+{
+    throw new Exception("JWT Settings are missing or incorrectly mapped from environment variables!");
+}
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.RequireHttpsMetadata = false;
+        options.SaveToken = true;
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -51,6 +66,21 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidAudience = jwtSettings.Audience,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
             ClockSkew = TimeSpan.Zero
+        };
+        options.Events = new JwtBearerEvents
+        {
+            OnAuthenticationFailed = context =>
+            {
+                var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
+                logger.LogError($"[JWT ERROR] Authentication failed: {context.Exception.Message}");
+                return Task.CompletedTask;
+            },
+            OnChallenge = context =>
+            {
+                var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
+                logger.LogWarning($"[JWT WARN] 401 Unauthorized sent. Reason: {context.ErrorDescription}");
+                return Task.CompletedTask;
+            }
         };
     });
 
@@ -79,10 +109,11 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwaggerUI(options => options.SwaggerEndpoint("/openapi/v1.json", "v1"));
 }
 
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
 
 app.UseAuthentication();

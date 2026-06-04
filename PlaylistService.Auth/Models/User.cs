@@ -19,7 +19,8 @@ namespace PlaylistService.Auth.Models
         [StringLength(255)]
         [EmailAddress]
         public required string Email { get; set; }
-        
+        public bool IsEmailConfirmed { get; set; } = false;
+
         public string? PasswordHash { get; set; }
 
         public string AuthProvider { get; set; } = "Local";

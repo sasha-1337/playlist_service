@@ -14,7 +14,19 @@ namespace PlaylistService.Auth.Controllers
     {
         private readonly IAuthService _authService;
         private readonly ILogger<AuthController> _logger;
-        private int CurrentUserId => int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var id) ? id : 0;
+        // private int CurrentUserId => int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var id) ? id : 0;
+        private int CurrentUserId
+        {
+            get
+            {
+                // Перевіряємо за стандартом JWT "sub" (Subject)
+                var claim = User.FindFirst(JwtRegisteredClaimNames.Sub)
+                            ?? User.FindFirst(ClaimTypes.NameIdentifier)
+                            ?? User.FindFirst("sub");
+
+                return int.TryParse(claim?.Value, out var id) ? id : 0;
+            }
+        }
 
         private string? CurrentUserEmail => User.FindFirst(ClaimTypes.Email)?.Value;
 
@@ -29,7 +41,7 @@ namespace PlaylistService.Auth.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-
+            _logger.LogInformation($"Registration attempt for email: {request.Email}");
             var response = await _authService.RegisterAsync(request);
 
             if (!response.Success)
@@ -37,7 +49,28 @@ namespace PlaylistService.Auth.Controllers
                 _logger.LogWarning($"Registration failed for email: {request.Email}. Reason: {response.Message}");
                 return BadRequest(response);
             }
-            _logger.LogInformation($"User registered successfully with email: {request.Email}");
+            _logger.LogInformation($"User saved to DB. Awaiting email verification for: {request.Email}");
+            return Ok(response);
+        }
+
+        [HttpPost("verify-email")]
+        public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailDto request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Code))
+                return BadRequest("Email and code are required");
+            
+            var response = await _authService.VerifyEmailAsync(request);
+
+            if (!response.Success)
+            {
+                _logger.LogWarning($"Email verification failed for email: {request.Email}. Reason: {response.Message}");
+                return BadRequest(response);
+            }
+
+            _logger.LogInformation($"Email verified successfully for email: {request.Email}");
             return Ok(response);
         }
 
@@ -80,13 +113,15 @@ namespace PlaylistService.Auth.Controllers
             var userId = CurrentUserId;
             if (userId == 0)
             {
-                _logger.LogWarning("Logout attempt failed: Claims missing in token.");
+                _logger.LogWarning($"Logout attempt failed: Claims missing in token. For userId: {userId}");
                 return Unauthorized(new { success = false, message = "Logout attempt failed: Claims missing in token." });
             }
+            _logger.LogInformation($"User with ID {userId} is attempting to log out.");
             var response = await _authService.LogoutAsync(userId);
+
             if (!response.Success)
                 return BadRequest(response);
-
+            _logger.LogInformation(response.Message);
             return Ok(response);
         }
 
@@ -127,8 +162,12 @@ namespace PlaylistService.Auth.Controllers
         [HttpDelete("remove-account")]
         public async Task<IActionResult> RemoveUser([FromBody] RemoveUserDto request)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-
+            _logger.LogInformation($"User with ID {request} is attempting to remove their account.");
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Remove account attempt failed: Invalid model state.");
+                return BadRequest(ModelState);
+            }
             var userId = CurrentUserId;
 
             if (userId == 0)
@@ -137,7 +176,7 @@ namespace PlaylistService.Auth.Controllers
             }
 
             var response = await _authService.RemoveUserAsync(userId, request);
-
+            _logger.LogInformation($"User with ID {response} is attempting to remove their account.");
             if (!response.Success) return BadRequest(response);
             return Ok(response);
         }

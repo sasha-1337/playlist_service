@@ -2,16 +2,22 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.Internal;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using PlaylistService.Auth.Data;
 using PlaylistService.Auth.DTOs;
+using PlaylistService.Auth.EnvSettingModels;
 using PlaylistService.Auth.Models;
+using PlaylistService.Auth.Services;
 using PlayListService.Auth.DTOs;
+using PlayListService.Auth.Strategy;
+using System.CodeDom.Compiler;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.WebSockets;
 using System.Security.Claims;
 using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace PlayListService.Auth.Services
 {
@@ -21,18 +27,27 @@ namespace PlayListService.Auth.Services
         private readonly IConfiguration _configuration;
         private readonly PasswordHasher<User> _passwordHasher;
         private readonly ILogger<AuthService> _logger;
-        private readonly JwtSettings _jwtSettings;
         private readonly GoogleSettings _googleAuthSettings;
+        private readonly IEmailService _emailService;
+        private readonly ITokenService _tokenService;
 
-        public AuthService(AuthDbContext dbContext, IConfiguration configuration, ILogger<AuthService> logger, IOptions<JwtSettings> jwtSettings, IOptions<GoogleSettings> googleAuthSettings)
+        private readonly Dictionary<string, IAuthStrategy> _strategies;
+
+        public AuthService(AuthDbContext dbContext, IConfiguration configuration, ILogger<AuthService> logger, IEnumerable<IAuthStrategy> strategies,
+                           IOptions<GoogleSettings> googleAuthSettings, IEmailService emailService, ITokenService tokenService)
         {
             _dbContext = dbContext;
             _configuration = configuration;
             _passwordHasher = new PasswordHasher<User>();
             _logger = logger;
-            _jwtSettings = jwtSettings.Value;
             _googleAuthSettings = googleAuthSettings.Value;
+            _emailService = emailService;
+
+            _strategies = strategies.ToDictionary(s => s.ActionType);
+            _tokenService = tokenService;
         }
+
+        private string GenerateConfirmationCode() => new Random().Next(100000, 999999).ToString();
 
         public async Task<AuthResponseDto> LoginAsync(LoginDto request)
         {
@@ -57,10 +72,9 @@ namespace PlayListService.Auth.Services
                         Message = "Invalid password"
                     };
                 }
-                user.LastLogin = DateTime.UtcNow;
                 
-                var token = GenerateJwtToken(user);
-                var refreshToken = GenerateRefreshToken();
+                var token = _tokenService.GenerateJwtToken(user);
+                var refreshToken = _tokenService.GenerateRefreshToken();
 
                 user.RefreshToken = refreshToken;
                 user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
@@ -94,65 +108,7 @@ namespace PlayListService.Auth.Services
                 };
             }
         }
-        public async Task<AuthResponseDto> RegisterAsync(RegisterDto request)
-        {
-            try
-            {
-                var existingUser = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == request.Email ||
-                                                                                   u.Username == request.Username);
-                if (existingUser != null)
-                {
-                    return new AuthResponseDto
-                    {
-                        Success = false,
-                        Message = "User with the same email or username already exists"
-                    };
-                }
 
-                var user = new User
-                {
-                    Email = request.Email,
-                    Username = request.Username,
-                    CreatedAt = DateTime.UtcNow,
-                };
-
-                user.PasswordHash = _passwordHasher.HashPassword(user, request.Password);
-
-                var token = GenerateJwtToken(user);
-                var refreshToken = GenerateRefreshToken();
-
-                user.RefreshToken = refreshToken;
-                user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
-
-                _dbContext.Users.Add(user);
-                await _dbContext.SaveChangesAsync();
-
-                _logger.LogInformation($"User {user.Email} registered successfully");
-                return new AuthResponseDto
-                {
-                    Success = true,
-                    Message = "User registered successfully",
-                    Token = token,
-                    RefreshToken = refreshToken,
-                    User = new UserDto
-                    {
-                        Id = user.Id,
-                        Email = user.Email,
-                        Username = user.Username,
-                        CreatedAt = user.CreatedAt
-                    }
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error occurred during user registration: {ex.Message}");
-                return new AuthResponseDto
-                {
-                    Success = false,
-                    Message = "An error occurred during registration. Please try again later."
-                };
-            }
-        }
         public async Task<AuthResponseDto> GoogleLoginAsync(GoogleAuthRequestDto request)
         {
             try
@@ -175,7 +131,8 @@ namespace PlayListService.Auth.Services
                         Username = payload.Name,
                         AuthProvider = "Google",
                         ExternalId = payload.Subject,
-                        CreatedAt = DateTime.UtcNow
+                        CreatedAt = DateTime.UtcNow,
+                        IsEmailConfirmed = true
                     };
                     _dbContext.Users.Add(user);
                 }
@@ -184,8 +141,8 @@ namespace PlayListService.Auth.Services
                     user.LastLogin = DateTime.UtcNow;
                 }
 
-                var token = GenerateJwtToken(user);
-                var refreshToken = GenerateRefreshToken();
+                var token = _tokenService.GenerateJwtToken(user);
+                var refreshToken = _tokenService.GenerateRefreshToken();
 
                 user.RefreshToken = refreshToken;
                 user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
@@ -223,31 +180,7 @@ namespace PlayListService.Auth.Services
                 return new AuthResponseDto { Success = false, Message = "An error occurred during Google login. Please try again later." };
             }
         }
-        public async Task<AuthResponseDto> ChangePasswordAsync(int userId, string email, ChangePasswordDto request)
-        {
-            try
-            {
-                var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId && u.Email == email);
-                if (user == null || !user.IsActive)
-                    return new AuthResponseDto { Success = false, Message = "User not found or inactive" };
-
-                var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.OldPassword);
-                if (result == PasswordVerificationResult.Failed)
-                    return new AuthResponseDto{ Success = false, Message = "Entered password is incorrect" };
-                
-                user.PasswordHash = _passwordHasher.HashPassword(user, request.NewPassword);
-                await _dbContext.SaveChangesAsync();
-
-                _logger.LogInformation($"User {user.Email} changed password successfully");
-                return new AuthResponseDto{ Success = true, Message = "Password changed successfully" };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error occurred during password change: {ex.Message}");
-                return new AuthResponseDto{ Success = false, Message = "An error occurred during password change." };
-            }
-        }
-
+        
         public async Task<AuthResponseDto> LogoutAsync(int userId)
         {
             try
@@ -256,6 +189,7 @@ namespace PlayListService.Auth.Services
                 if (user == null || !user.IsActive)
                     return new AuthResponseDto { Success = false, Message = $"User not found or bad token {userId}" };
                 
+                user.LastLogin = DateTime.UtcNow;
                 user.RefreshToken = null;
                 user.RefreshTokenExpiry = null;
                 
@@ -271,23 +205,139 @@ namespace PlayListService.Auth.Services
             }
         }
 
+        public async Task<AuthResponseDto> VerifyEmailAsync(VerifyEmailDto request)
+        {
+            try
+            {
+                var action = await _dbContext.PendingActions.FirstOrDefaultAsync(a => a.Email == request.Email && 
+                                                                                      a.Code == request.Code && 
+                                                                                      a.ExpiresAt > DateTime.UtcNow);
+
+                if (action == null)
+                    return new AuthResponseDto { Success = false, Message = "Invalid or expired confirmation code." };
+
+                if (!_strategies.TryGetValue(action.ActionType, out var strategy))
+                    return new AuthResponseDto { Success = false, Message = "Invalid action type." };
+
+
+                var result = await strategy.ExecuteAsync(action.Email, action.JsonData, action.UserId);
+
+                if (result.Success)
+                {
+                    _dbContext.PendingActions.Remove(action);
+                    await _dbContext.SaveChangesAsync();
+
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error while checking code: {ex.Message}");
+                return new AuthResponseDto { Success = false, Message = "Error while saving. Try later." };
+            }
+        }
+
+        public async Task<AuthResponseDto> RegisterAsync(RegisterDto request)
+        {
+            try
+            {
+                var existingUser = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == request.Email ||
+                                                                                   u.Username == request.Username);
+                
+                if (existingUser != null && existingUser.IsEmailConfirmed)
+                {
+                    return new AuthResponseDto
+                    {
+                        Success = false,
+                        Message = "User with the same email or username already exists"
+                    };
+                }
+                
+                var confirmationCode = GenerateConfirmationCode();
+
+                var cacheData = new RegisterCacheData(request.Username, request.Password );
+
+                await CreatePendingActionAsync(request.Email, "Register", System.Text.Json.JsonSerializer.Serialize(cacheData), null, confirmationCode);
+
+                await _emailService.SendEmailAsync(request.Email, "Confirmation code", $"Your code: {confirmationCode}");
+
+                _logger.LogInformation($"Code {confirmationCode} has been sent to {request.Email}. Waiting for confirmation.");
+
+                return new AuthResponseDto
+                {
+                    Success = true,
+                    Message = "Confirmation code has been sent on your email. Input it for registration ending."
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error occurred during user registration: {ex.Message}");
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "An error occurred during registration. Please try again later."
+                };
+            }
+        }
+        
+        public async Task<AuthResponseDto> ChangePasswordAsync(int userId, string email, ChangePasswordDto request)
+        {
+            try
+            {
+                var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId && u.Email == email);
+                if (user == null || !user.IsActive)
+                    return new AuthResponseDto { Success = false, Message = "User not found or inactive" };
+
+                var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.OldPassword);
+                if (result == PasswordVerificationResult.Failed)
+                    return new AuthResponseDto { Success = false, Message = "Entered password is incorrect" };
+
+                var newPasswordHash = _passwordHasher.HashPassword(user, request.NewPassword);
+                var cacheData = new ChangePasswordCacheData(newPasswordHash);
+
+                var confirmationCode = GenerateConfirmationCode();
+
+                await CreatePendingActionAsync(email, "ChangePassword", System.Text.Json.JsonSerializer.Serialize(cacheData), userId, confirmationCode);
+
+                await _emailService.SendEmailAsync(email, "Confirmation code for password change", $"Your code: {confirmationCode}");
+
+                return new AuthResponseDto
+                {
+                    Success = true,
+                    Message = "Confirmation code has been sent to your email. Input it to complete password change."
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error occurred during password change: {ex.Message}");
+                return new AuthResponseDto{ Success = false, Message = "An error occurred during password change." };
+            }
+        }
+
         public async Task<AuthResponseDto> RemoveUserAsync(int userId, RemoveUserDto request)
         {
             try
             {
                 var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
-                if (user == null) 
+                if (user == null)
                     return new AuthResponseDto { Success = false, Message = "User not found" };
-                
+
                 var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
                 if (result == PasswordVerificationResult.Failed)
                     return new AuthResponseDto { Success = false, Message = "Entered password is incorrect" };
 
-                _logger.LogInformation($"User Id: {user.Id} Email: {user.Email} is being removed");
+                var confirmationCode = GenerateConfirmationCode();
 
-                await _dbContext.Users.Where(u => u.Id == userId).ExecuteDeleteAsync();
+                await CreatePendingActionAsync(user.Email, "RemoveAccount", "{}", userId, confirmationCode);
 
-                return new AuthResponseDto { Success = true, Message = "User removed successfully" };
+                await _emailService.SendEmailAsync(user.Email, "Confirmation code for account removal", $"Your code: {confirmationCode}");
+
+                return new AuthResponseDto
+                {
+                    Success = true,
+                    Message = "Confirmation code has been sent on your email. Input it to end deleting."
+                };
             }
             catch
             {
@@ -296,11 +346,31 @@ namespace PlayListService.Auth.Services
             }
         }
 
+        private async Task CreatePendingActionAsync(string email, string actionType, string jsonData, int? userId, string code)
+        {
+            var oldAction = _dbContext.PendingActions.Where(a => a.Email == email && a.ActionType == actionType);
+            _dbContext.PendingActions.RemoveRange(oldAction);
+
+            var pendingAction = new PendingAction
+            {
+                Email = email,
+                ActionType = actionType,
+                Code = code,
+                JsonData = jsonData,
+                UserId = userId,
+                ExpiresAt = DateTime.UtcNow.AddMinutes(15)
+            };
+
+            _dbContext.PendingActions.Add(pendingAction);
+            await _dbContext.SaveChangesAsync();
+
+        }
+
         public async Task<AuthResponseDto> RefreshTokenAsync(RefreshTokenDto request)
         {
             try
             {
-                var principal = GetPrincipalFromExpiredToken(request.AccessToken);
+                var principal = _tokenService.GetPrincipalFromExpiredToken(request.AccessToken);
 
                 var userIdClaim = int.Parse(principal?.FindFirst(JwtRegisteredClaimNames.Sub)?.Value ?? "0");
                 var emailClaim = principal?.FindFirst(JwtRegisteredClaimNames.Email)?.Value;
@@ -316,8 +386,8 @@ namespace PlayListService.Auth.Services
                     return new AuthResponseDto { Success = false, Message = "Invalid token" };
                 
                 
-                var newAccessToken = GenerateJwtToken(user);
-                var newRefreshToken = GenerateRefreshToken();
+                var newAccessToken = _tokenService.GenerateJwtToken(user);
+                var newRefreshToken = _tokenService.GenerateRefreshToken();
                 
                 user.RefreshToken = newRefreshToken;
 
@@ -349,69 +419,6 @@ namespace PlayListService.Auth.Services
                     Message = "An error occurred during token refresh. Please log in again."
                 };
             }
-        }
-
-
-        private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
-        {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
-
-            var tokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateAudience = true,
-                ValidAudience = _jwtSettings.Audience,
-                ValidateIssuer = true,
-                ValidIssuer = _jwtSettings.Issuer,
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = securityKey,
-                ValidateLifetime = false
-            };
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
-
-            if (!(securityToken is JwtSecurityToken jwtSecurityToken) ||
-                !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256,
-                    StringComparison.InvariantCultureIgnoreCase))
-            {
-                throw new SecurityTokenException("Invalid token");
-            }
-
-            return principal;
-        }
-
-        private string GenerateJwtToken(User user)
-        {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-            var claims = new[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Email, user.Email),
-
-                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            };
-
-            var token = new JwtSecurityToken(
-                issuer: _jwtSettings.Issuer,
-                audience: _jwtSettings.Audience,
-                claims: claims,
-                expires: DateTime.UtcNow.AddDays(1),
-                signingCredentials: credentials
-            );
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
-
-        private string GenerateRefreshToken()
-        {
-            var randomNumber = new byte[64];
-            using var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
-            rng.GetBytes(randomNumber);
-            return Convert.ToBase64String(randomNumber);
         }
     }
 }

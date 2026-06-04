@@ -37,7 +37,7 @@ const AlbumForm = ({ onClose, onSave, editAlbum, selectedAlbum }) => {
             name: albumName,
             genre: albumGenre,
             description: albumDescription,
-            songs: selectedAlbum ? selectedAlbum.songs : [],
+            //songs: selectedAlbum ? selectedAlbum.songs : [],
             coverImage: albumCoverImage
         };
 
@@ -77,7 +77,7 @@ const AlbumForm = ({ onClose, onSave, editAlbum, selectedAlbum }) => {
             <div className={styles.modalContent}>
                 <form onSubmit={handleSubmit} className={styles.form}>
                     <h2>Додати новий альбом</h2>
-                    <input 
+                    <input
                         type="text"
                         name="creator"
                         placeholder="Автор альбому"
@@ -109,7 +109,7 @@ const AlbumForm = ({ onClose, onSave, editAlbum, selectedAlbum }) => {
                         value={albumDescription}
                         onChange={handleChange}
                     />
-                    {albumCoverImage && ( 
+                    {albumCoverImage && (
 
                         <img
                             alt="Crop"
@@ -146,79 +146,3 @@ const AlbumForm = ({ onClose, onSave, editAlbum, selectedAlbum }) => {
 };
 
 export default AlbumForm;
-
-/*
-import React, { useState } from 'react';
-import ImageHandler from "./ImageHandler"
-import "./styles/AlbumForm.css"
-
-const AlbumForm = ({ onClose, onSave, editAlbum, selectedAlbum }) => {
-    const [albumName, setAlbumName] = useState('');
-    const [albumDescription, setAlbumDescription] = useState('');
-    const [albumCoverImage, setAlbumCoverImage] = useState("");
-    const [isImageFormOpen, setImageFormOpen] = useState(false);
-
-    const addImage = (image) => {
-        setAlbumCoverImage(image);
-    }
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (albumName.trim()) {
-            onSave({
-                name: albumName,
-                description: albumDescription,
-                coverImage: albumCoverImage
-            });
-            onClose();
-        }
-    };
-
-    return (
-        <div className="modal-overlay">
-            <div className="modal-content">
-                <form onSubmit={handleSubmit} className="form">
-                    <h2>Додати новий альбом</h2>
-                    <input
-                        type="text"
-                        value={albumName}
-                        onChange={(e) => setAlbumName(e.target.value)}
-                        placeholder="Назва альбому"
-                        className="input"
-                        required
-                    />
-                    <textarea
-                        value={albumDescription}
-                        onChange={(e) => setAlbumDescription(e.target.value)}
-                        placeholder="Опис альбому"
-                        className="input textarea"
-                    />
-                    <div
-                        className="button"
-                        onClick={() => setImageFormOpen(true)}
-                    >
-                        Додати обкладинку
-                    </div>
-                    <div className="button-group">
-                        <button type="button" onClick={onClose} className="button">
-                            Скасувати
-                        </button>
-                        <button type="submit" className="save-button">
-                            Зберегти
-                        </button>
-                    </div>
-                </form>
-            </div>
-            {isImageFormOpen && (
-                <ImageHandler
-                    onClose={() => setImageFormOpen(false)}
-                    onSave={addImage}
-                />
-            )}
-        </div>
-
-    );
-};
-
-export default AlbumForm;
-*/

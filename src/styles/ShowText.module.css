@@ -1,6 +1,13 @@
-﻿html {
-    overflow-y: scroll; /* завжди показує вертикальний скролбар */
-}
+﻿/* ==========================================================
+   ShowText.module.css
+   
+   Desktop: два блоки поряд (60% lyrics + 40% description)
+   Mobile:  вкладки (Lyrics / Info) — одна панель за раз,
+            без горизонтального скролу і фіксованих висот
+   ========================================================== */
+
+/* ── Container ───────────────────────────────────────────── */
+
 .commonContainer {
     position: relative;
     width: 100%;
@@ -11,13 +18,12 @@
     box-sizing: border-box;
 }
 
-/* Ліва частина — текст */
+/* ── Lyrics Panel ────────────────────────────────────────── */
+
 .lyricsContainer {
-    /*цidth: 60%;*/
-    flex-basis: 60%;
-    flex-shrink: 0;
-    flex-grow: 0;
-    height: 900px;
+    flex: 0 0 60%;
+    min-width: 0;
+    height: 100%;
     background-color: rgba(0, 0, 0, 0.7);
     padding: 15px;
     border-radius: 10px;
@@ -31,30 +37,19 @@
     color: white;
     font-size: 20px;
     display: flex;
-    flex-direction: column; /* важливо: щоб текст ішов у стовпчик */
-    align-items: flex-start; /* вирівнювання по лівому краю */
+    flex-direction: column;
+    align-items: flex-start;
     justify-content: flex-start;
     overflow: hidden;
+    min-height: 0;
 }
 
-/* Права частина — опис і обкладинка */
-/*.descriptionVynilContainer {*/
-    /*width: 40%;*/
-    /*flex-basis: 40%;
-    flex-shrink: 0;
-    flex-grow: 0;
-    height: 900px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    box-sizing: border-box;
-}*/
+/* ── Description Panel ───────────────────────────────────── */
 
 .descriptionContainer {
-    flex-basis: 40%;
-    flex-shrink: 0;
-    flex-grow: 0;
-    height: 900px;
+    flex: 0 0 40%;
+    min-width: 0;
+    height: 100%;
     background-color: rgba(255, 255, 255, 0.3);
     padding: 15px;
     border-radius: 10px;
@@ -68,144 +63,154 @@
     color: white;
     font-size: 18px;
     display: flex;
-    flex-direction: column; /* текст вертикально */
+    flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
     overflow: hidden;
+    min-height: 0;
 }
+
+/* ── Text Content ────────────────────────────────────────── */
 
 .textBlock {
-    white-space: pre-wrap; /* зберігає абзаци */
-    word-wrap: break-word; /* переносить довгі рядки */
-    overflow-wrap: break-word; /* дублює для сумісності */
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
     word-break: break-word;
+    line-height: 1.6;
 }
 
-/* Контейнер зі скролом */
-    .scrollContent {
+/* ── Scrollable wrapper ──────────────────────────────────── */
+
+.scrollContent {
     width: 100%;
-    max-height: 100%;
+    height: 100%;
     overflow-y: auto;
-    overflow-x: hidden; /* ← блокуємо горизонтальний скрол */
-    padding-right: 10px;
+    overflow-x: hidden;
+    padding-right: 8px;
     box-sizing: border-box;
 }
 
-    /* Кастомний скролбар */
     .scrollContent::-webkit-scrollbar {
-        width: 10px;
+        width: 8px;
     }
 
     .scrollContent::-webkit-scrollbar-track {
-        background: none;
-        border-radius: 4px;
+        background: transparent;
     }
 
     .scrollContent::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.7);
+        background: rgba(255,255,255,0.55);
         border-radius: 4px;
     }
 
         .scrollContent::-webkit-scrollbar-thumb:hover {
-            background: white;
+            background: rgba(255,255,255,0.9);
         }
 
-/*.commonContainer {
-    position: absolute;
-    width: 100%; 
-    display: flex; 
-    flex-direction: row; 
-    gap: 15px;zzaZazaq  
+/* ── Mobile Tab Bar ──────────────────────────────────────── */
+/* Ховаємо на desktop */
+.tabBar {
+    display: none;
 }
 
-.descriptionVynilContainer {
-    width: 40%;
-    height: 900px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+.tabPanel {
+    display: none;
 }
 
-.lyricsContainer {
-    width: 60%;
-    height: 900px;
-    background-color: rgba(0,0,0,0.7);
-    padding: 15px 5px 15px 15px;
-    border-radius: 10px;
-}
+/* ── Responsive ──────────────────────────────────────────── */
 
-.lyrics {
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    font-size: 40px;
-}
-
-.descriptionContainer {
-    width: 100%;
-    height: 100%;
-    background-color: rgba(255, 255, 255, 0.3);
-    padding: 15px 5px 15px 15px;
-    border-radius: 10px;
-}
-
-.description {
-    position: relative;
-    width: 50%;
-    color: white;
-    font-size: 24px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-}*/
-
-/*.descriptionContainer {
-    width: 40%;
-    height: 900px;
-    background-color: rgba(255,255,255,0.3);
-    padding: 15px 5px 15px 15px;
-    border-radius: 10px;
-}
-
-.description {
-    position: relative;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    font-size: 30px;
-    padding: 15px 5px 15px 5px;
-}*/
-
-/*.scrollContent {
-    max-height: 100%*//*calc(100% - 50px)*//*;*/ /* Висота без заголовка */
-    /*overflow-y: auto;*/ /* Додаємо вертикальний скрол */
-    /*padding-right: 10px;
-    width: 100%;
-}*/
-
-    /* Кастомний скролбар */
-    /*.scrollContent::-webkit-scrollbar {
-        width: 10px;*/ /* Товщина скролбару */
-    /*}
-
-    .scrollContent::-webkit-scrollbar-track {
-        background: none;*/ /*rgba(255,255,255,0.8);*/ /* Колір фону */
-        /*border-radius: 4px;
+@media (max-width: 768px) {
+    /*
+     * На мобільному замість двох колонок — вкладки.
+     * Стандартні панелі ховаємо, показуємо tab-версію.
+     */
+    .commonContainer {
+        flex-direction: column;
+        gap: 0;
+        height: 100%;
+        overflow: hidden;
     }
 
-    .scrollContent::-webkit-scrollbar-thumb {
-        background: rgb(255, 255, 255, 0.7);*/ /* Колір скролу */
-        /*border-radius: 4px;
+    /* Ховаємо desktop панелі */
+    .lyricsContainer,
+    .descriptionContainer {
+        display: none;
     }
 
-        .scrollContent::-webkit-scrollbar-thumb:hover {
-            background: white;*/ /* Колір при наведенні */
-        /*}*/
+    /* Tab bar */
+    .tabBar {
+        display: flex;
+        flex-shrink: 0;
+        border-bottom: 1px solid rgba(255,255,255,0.2);
+        margin-bottom: 0;
+    }
 
+    .tabButton {
+        flex: 1;
+        padding: 12px 8px;
+        background: rgba(0,0,0,0.5);
+        border: none;
+        border-bottom: 3px solid transparent;
+        color: rgba(255,255,255,0.55);
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: color 0.2s, border-color 0.2s, background 0.2s;
+    }
+
+        .tabButton:hover {
+            color: rgba(255,255,255,0.85);
+            background: rgba(255,255,255,0.05);
+        }
+
+        .tabButton.tabActive {
+            color: #ffffff;
+            border-bottom-color: #ffffff;
+            background: rgba(255,255,255,0.08);
+        }
+
+    /* Tab panels */
+    .tabPanel {
+        display: none;
+        flex: 1;
+        min-height: 0;
+        overflow: hidden;
+        padding: 14px 12px;
+        box-sizing: border-box;
+    }
+
+        .tabPanel.tabPanelActive {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Lyrics tab */
+        .tabPanel.lyricsPanel {
+            background: rgba(0,0,0,0.7);
+            border-radius: 0 0 10px 10px;
+            color: white;
+            font-size: 17px;
+        }
+
+        /* Info tab */
+        .tabPanel.infoPanel {
+            background: rgba(255,255,255,0.25);
+            border-radius: 0 0 10px 10px;
+            color: white;
+            font-size: 16px;
+        }
+}
+
+@media (max-width: 480px) {
+    .tabButton {
+        font-size: 13px;
+        padding: 10px 6px;
+    }
+
+    .tabPanel {
+        padding: 12px 10px;
+    }
+}

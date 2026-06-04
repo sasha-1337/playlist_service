@@ -1,4 +1,5 @@
 ﻿using PlaylistService.Auth.DTOs;
+using PlaylistService.Auth.Models;
 using PlayListService.Auth.DTOs;
 
 namespace PlayListService.Auth.Services
@@ -12,5 +13,6 @@ namespace PlayListService.Auth.Services
         Task<AuthResponseDto> LogoutAsync(int userId);
         Task<AuthResponseDto> ChangePasswordAsync(int userId, string email, ChangePasswordDto request);
         Task<AuthResponseDto> RemoveUserAsync(int userId, RemoveUserDto request);
+        Task<AuthResponseDto> VerifyEmailAsync(VerifyEmailDto request);
     }
 }

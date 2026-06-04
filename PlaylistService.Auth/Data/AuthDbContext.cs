@@ -11,6 +11,8 @@ namespace PlaylistService.Auth.Data
 
         public DbSet<User> Users { get; set; }
 
+        public DbSet<PendingAction> PendingActions { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

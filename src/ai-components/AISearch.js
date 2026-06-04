@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { FaSearch, FaRobot, FaTimes, FaDatabase, FaTrash, FaSyncAlt, FaInfoCircle } from 'react-icons/fa';
 import '../styles/AISearch.css';
 
@@ -19,12 +19,34 @@ const AISearch = ({ onSelectItem, onClose }) => {
     const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
     const containerRef = useRef(null);
 
-    const AI_API_URL = "http://localhost:5001/api/ai";
-    const API_URL = "http://localhost:5000/api";
+    const AI_API_URL = process.env.REACT_APP_AI_API_URL || "http://localhost:5001/api/ai";
+    const API_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000/api";
+
+    const checkAIStatus = useCallback(async () => {
+        try {
+            const response = await fetch(`${AI_API_URL}/status`);
+            const data = await response.json();
+            setAiStatus(data);
+
+            // Встановлюємо поточну модель з сервера
+            if (data.current_model) {
+                const modelKey = Object.entries({
+                    'LaBSE': 'sentence-transformers/LaBSE',
+                    'MiniLM': 'paraphrase-multilingual-MiniLM-L12-v2',
+                    'DistilUSE': 'distiluse-base-multilingual-cased-v2'
+                }).find(([key, value]) => value === data.current_model)?.[0] || 'LaBSE';
+
+                setSelectedModel(modelKey);
+            }
+        } catch (err) {
+            console.error("AI сервіс недоступний:", err);
+            setAiStatus({ status: 'offline' });
+        }
+    }, [AI_API_URL]);
 
     useEffect(() => {
         checkAIStatus();
-    }, []);
+    }, [checkAIStatus]);
 
     // Drag handlers
     const handleMouseDown = (e) => {
@@ -45,18 +67,18 @@ const AISearch = ({ onSelectItem, onClose }) => {
         });
     };
 
-    const handleMouseMove = (e) => {
+    const handleMouseMove = useCallback((e) => {
         if (!isDragging) return;
 
         setPosition({
             x: e.clientX - dragStart.x,
             y: e.clientY - dragStart.y
         });
-    };
+    }, [dragStart.x, dragStart.y, isDragging]);
 
-    const handleMouseUp = () => {
+    const handleMouseUp = useCallback(() => {
         setIsDragging(false);
-    };
+    },[]);
 
     useEffect(() => {
         if (isDragging) {
@@ -68,29 +90,9 @@ const AISearch = ({ onSelectItem, onClose }) => {
                 document.removeEventListener('mouseup', handleMouseUp);
             };
         }
-    }, [isDragging, dragStart]);
+    }, [isDragging, handleMouseMove, handleMouseUp]);
 
-    const checkAIStatus = async () => {
-        try {
-            const response = await fetch(`${AI_API_URL}/status`);
-            const data = await response.json();
-            setAiStatus(data);
 
-            // Встановлюємо поточну модель з сервера
-            if (data.current_model) {
-                const modelKey = Object.entries({
-                    'LaBSE': 'sentence-transformers/LaBSE',
-                    'MiniLM': 'paraphrase-multilingual-MiniLM-L12-v2',
-                    'DistilUSE': 'distiluse-base-multilingual-cased-v2'
-                }).find(([key, value]) => value === data.current_model)?.[0] || 'LaBSE';
-
-                setSelectedModel(modelKey);
-            }
-        } catch (err) {
-            console.error("AI сервіс недоступний:", err);
-            setAiStatus({ status: 'offline' });
-        }
-    };
 
     const handleModelChange = async (e) => {
         const newModel = e.target.value;
@@ -179,7 +181,6 @@ const AISearch = ({ onSelectItem, onClose }) => {
     };
 
     const rebuildEmbeddings = async (forceRebuild = false) => {
-        const action = forceRebuild ? "повну перебудову" : "інкрементальне оновлення";
 
         if (forceRebuild) {
             if (!window.confirm('⚠️ Це видалить всі збережені embeddings та створить їх заново.\nПродовжити?')) {

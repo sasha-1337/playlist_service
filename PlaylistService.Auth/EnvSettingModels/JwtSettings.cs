@@ -1,4 +1,4 @@
-namespace PlaylistService.Auth.Models
+namespace PlaylistService.Auth.EnvSettingModels
 {
     public class JwtSettings
     {

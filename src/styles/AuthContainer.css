@@ -1,0 +1,226 @@
+.auth-header {
+    /* Абсолютне позиціонування відносно .logo-header (position: relative) */
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0;
+    background: transparent;
+    color: white;
+    /* z-index вищий за .logo-header (10) щоб dropdown не обрізався */
+    z-index: 20;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: white;
+    white-space: nowrap;
+}
+
+.auth-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.auth-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 3px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    /* Висота фіксована щоб вписатись в 80px хедер */
+    height: 36px;
+}
+
+.login-button {
+    background: transparent;
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.6);
+}
+
+    .login-button:hover {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: #ffffff;
+    }
+
+.register-button {
+    background: #ffffff;
+    color: #000000;
+    border-color: #ffffff;
+}
+
+    .register-button:hover {
+        background: rgba(255, 255, 255, 0.85);
+    }
+
+.logout-button {
+    background: transparent;
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.6);
+}
+
+    .logout-button:hover {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: #ffffff;
+    }
+
+/* ── Auth Redirect (повноекранна заглушка поки не залогінений) ── */
+
+.auth-redirect {
+    position: fixed;
+    inset: 0;
+    /* Поверх всього контенту, але під модальними вікнами */
+    z-index: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    /* Темний blur поверх розмитого фону */
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(4px);
+}
+
+.auth-redirect-content {
+    text-align: center;
+    background: #ffffff;
+    padding: 60px 40px;
+    border-radius: 4px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    max-width: 480px;
+    width: 100%;
+    border: 1px solid #e0e0e0;
+}
+
+    .auth-redirect-content h1 {
+        font-size: 28px;
+        color: #000000;
+        margin: 0 0 12px 0;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+    }
+
+    .auth-redirect-content p {
+        font-size: 15px;
+        color: #555;
+        margin: 0 0 28px 0;
+        line-height: 1.6;
+    }
+
+.auth-redirect-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.auth-redirect-button {
+    flex: 1;
+    max-width: 180px;
+    padding: 12px 20px;
+    border: 1px solid #000000;
+    border-radius: 3px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+    .auth-redirect-button.login {
+        background: #000000;
+        color: #ffffff;
+    }
+
+        .auth-redirect-button.login:hover {
+            background: #333333;
+            border-color: #333333;
+        }
+
+    .auth-redirect-button.register {
+        background: #ffffff;
+        color: #000000;
+    }
+
+        .auth-redirect-button.register:hover {
+            background: #f5f5f5;
+        }
+
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    font-size: 18px;
+    color: #ffffff;
+}
+
+/* ── Responsive ─────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+    .auth-header {
+        right: 12px;
+        gap: 6px;
+    }
+
+    .auth-button {
+        padding: 6px 10px;
+        font-size: 12px;
+        height: 32px;
+    }
+
+    .auth-redirect-content {
+        padding: 36px 24px;
+    }
+
+        .auth-redirect-content h1 {
+            font-size: 22px;
+        }
+}
+
+@media (max-width: 480px) {
+    .user-info {
+        display: none; /* Ховаємо email, залишаємо лише аватар */
+    }
+
+    .auth-button {
+        padding: 6px 8px;
+        font-size: 11px;
+        height: 30px;
+    }
+
+    .auth-redirect {
+        padding: 16px;
+    }
+
+    .auth-redirect-content {
+        padding: 28px 16px;
+    }
+
+        .auth-redirect-content h1 {
+            font-size: 18px;
+        }
+
+    .auth-redirect-buttons {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .auth-redirect-button {
+        max-width: unset;
+    }
+}

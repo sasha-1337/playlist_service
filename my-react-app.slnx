@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="PlayerService.Auth/PlayerService.Auth.csproj" />
+  <Project Path="PlaylistService.Auth/PlaylistService.Auth.csproj" />
+</Solution>
