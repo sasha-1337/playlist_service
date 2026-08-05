@@ -3,23 +3,26 @@ import { createPortal } from 'react-dom';
 import LoginForm from '../forms/LoginForm';
 import RegisterForm from '../forms/RegisterForm';
 import UserMenu from './UserMenu';
-import { useAuth } from '../context/AuthContext';
+import { useIsAuthenticated, useAppDispatch, useAppSelector } from '../store/hooks';
+import { setShowLoginForm, setShowRegisterForm } from '../store/slices/uiSlice';
+import { selectShowLoginForm, selectShowRegisterForm } from '../store/selectors/uiSelectors';
 import '../styles/AuthContainer.css';
 
 const AuthContainer = () => {
-    const { isAuthenticated } = useAuth();
-    const [showLoginForm, setShowLoginForm] = useState(false);
-    const [showRegisterForm, setShowRegisterForm] = useState(false);
+    const isAuthenticated = useIsAuthenticated();
+    const dispatch = useAppDispatch();
+    const showLoginForm = useAppSelector(selectShowLoginForm);
+    const showRegisterForm = useAppSelector(selectShowRegisterForm);
 
     const handleLoginSuccess = (data) => {
-        setShowLoginForm(false);
+        dispatch(setShowLoginForm(false));
     };
 
     const handleRegisterSuccess = (data) => {
-        setShowRegisterForm(false);
+        dispatch(setShowRegisterForm(false));
 
         if (!data?.token) {
-            setShowLoginForm(true);
+            dispatch(setShowLoginForm(true));
         }
     };
 
@@ -32,13 +35,13 @@ const AuthContainer = () => {
             ) : (
                 <div className="auth-buttons">
                     <button 
-                        onClick={() => setShowLoginForm(true)}
+                        onClick={() => dispatch(setShowLoginForm(true))}
                         className="auth-button login-button"
                     >
                         Sign in
                     </button>
                     <button 
-                        onClick={() => setShowRegisterForm(true)}
+                        onClick={() => dispatch(setShowRegisterForm(true))}
                         className="auth-button register-button"
                     >
                         Register
@@ -61,13 +64,13 @@ const AuthContainer = () => {
                         <p>Please log in or register to use the service.</p>
                         <div className="auth-redirect-buttons">
                             <button 
-                                onClick={() => setShowLoginForm(true)}
+                                onClick={() => dispatch(setShowLoginForm(true))}
                                 className="auth-redirect-button login"
                             >
                                 Sign in
                             </button>
                             <button 
-                                onClick={() => setShowRegisterForm(true)}
+                                onClick={() => dispatch(setShowRegisterForm(true))}
                                 className="auth-redirect-button register"
                             >
                                 Register
@@ -80,7 +83,7 @@ const AuthContainer = () => {
             {/* Show Login Form */}
             {showLoginForm && (
                 <LoginForm
-                    onClose={() => setShowLoginForm(false)}
+                    onClose={() => dispatch(setShowLoginForm(false))}
                     onSuccess={handleLoginSuccess}
                 />
             )}
@@ -88,7 +91,7 @@ const AuthContainer = () => {
             {/* Show Register Form */}
             {showRegisterForm && (
                 <RegisterForm
-                    onClose={() => setShowRegisterForm(false)}
+                    onClose={() => dispatch(setShowRegisterForm(false))}
                     onSuccess={handleRegisterSuccess}
                 />
             )}

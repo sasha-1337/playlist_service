@@ -1,8 +1,10 @@
 import React from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAppSelector, useIsAuthenticated } from '../store/hooks';
+import { selectAuthIsLoading } from '../store/selectors/authSelectors';
 
 const ProtectedRoute = ({ children }) => {
-    const { isAuthenticated, isLoading } = useAuth();
+    const isAuthenticated = useIsAuthenticated();
+    const isLoading = useAppSelector(selectAuthIsLoading);
 
     if (isLoading) {
         return <div className="loading">Завантаження...</div>;

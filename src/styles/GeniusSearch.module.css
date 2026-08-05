@@ -1,0 +1,136 @@
+/* GeniusSearch.module.css */
+
+.searchContainer {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    box-sizing: border-box;
+}
+
+.searchInput {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 15px;
+    color: #000;
+    background-color: #fff;
+    border: 2px solid #000;
+    border-radius: 0; /* Строгий прямокутний дизайн без заокруглень */
+    outline: none;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+    .searchInput::placeholder {
+        color: #888;
+    }
+
+    .searchInput:focus {
+        /* Жорстка тінь для акценту замість стандартного світіння */
+        box-shadow: 4px 4px 0px #000;
+        transform: translate(-2px, -2px);
+    }
+
+.loader {
+    font-size: 11px;
+    font-weight: 700;
+    color: #000;
+    margin-top: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    background-color: #fff;
+    border: 2px solid #000;
+    max-height: 320px;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: 4px 4px 0px #000;
+}
+
+    /* Строгий чорно-білий скроллбар для Webkit-браузерів */
+    .dropdown::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .dropdown::-webkit-scrollbar-track {
+        background: #fff;
+        border-left: 2px solid #000;
+    }
+
+    .dropdown::-webkit-scrollbar-thumb {
+        background: #000;
+    }
+
+.dropdownItem {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 2px solid #000;
+    cursor: pointer;
+    background-color: #fff;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+    .dropdownItem:last-child {
+        border-bottom: none;
+    }
+
+    /* Інверсія кольорів при наведенні курсора */
+    .dropdownItem:hover {
+        background-color: #000;
+        color: #fff;
+    }
+
+.thumb {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    margin-right: 16px;
+    filter: grayscale(100%); /* Робимо обкладинки чорно-білими */
+    border: 1px solid #000;
+    transition: filter 0.3s ease;
+}
+
+/* При наведенні на елемент повертаємо обкладинці оригінальні кольори */
+.dropdownItem:hover .thumb {
+    filter: grayscale(0%);
+    border-color: #fff;
+}
+
+.trackInfo {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.trackTitle {
+    font-weight: 700;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.trackArtist {
+    font-size: 12px;
+    margin-top: 4px;
+    color: #555;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color 0.2s ease;
+}
+
+/* Текст артиста має стати світлим на чорному тлі */
+.dropdownItem:hover .trackArtist {
+    color: #aaa;
+}

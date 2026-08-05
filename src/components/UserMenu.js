@@ -1,11 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MdLogout, MdSettings } from 'react-icons/md';
-import { useAuth } from '../context/AuthContext';
+import { useCurrentUser, useAppDispatch } from '../store/hooks';
+import { logout } from '../store/slices/authSlice';
 import SettingsModal from './SettingsModal';
 import '../styles/UserMenu.css';
 
 const UserMenu = () => {
-    const { currentUser, logout } = useAuth();
+    const currentUser = useCurrentUser();
+    const dispatch = useAppDispatch();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
     const menuRef = useRef(null);
@@ -28,7 +30,7 @@ const UserMenu = () => {
     }, [isDropdownOpen]);
 
     const handleLogout = async () => {
-        await logout();
+        await dispatch(logout());
         setIsDropdownOpen(false);
     };
 

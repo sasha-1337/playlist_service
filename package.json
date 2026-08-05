@@ -4,6 +4,8 @@
   "private": true,
   "dependencies": {
     "@react-oauth/google": "^0.13.5",
+    "@reduxjs/toolkit": "^2.12.0",
+    "axios": "^1.19.0",
     "bootstrap": "^5.3.3",
     "cra-template": "1.2.0",
     "croppie": "^2.6.5",
@@ -19,6 +21,7 @@
     "react-icons": "^5.4.0",
     "react-image-crop": "^11.0.7",
     "react-player": "^3.4.0",
+    "react-redux": "^9.3.0",
     "react-scripts": "^5.0.1",
     "styled-components": "^6.1.15"
   },

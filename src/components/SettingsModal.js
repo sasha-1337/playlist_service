@@ -158,13 +158,15 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { MdClose } from 'react-icons/md';
-import { useAuth } from '../context/AuthContext';
+import { useCurrentUser, useAppDispatch } from '../store/hooks';
+import { logout } from '../store/slices/authSlice';
 import ChangePasswordForm from '../forms/ChangePasswordForm';
 import DeleteAccountConfirm from '../forms/DeleteAccountForm';
 import styles from '../styles/SettingsModal.module.css';
 
 const SettingsModal = ({ onClose }) => {
-    const { currentUser, logout } = useAuth();
+    const currentUser = useCurrentUser();
+    const dispatch = useAppDispatch();
     const [activeTab, setActiveTab] = useState('account');
     const [showChangePassword, setShowChangePassword] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -203,7 +205,7 @@ const SettingsModal = ({ onClose }) => {
     };
 
     const handleDeleteSuccess = async () => {
-        await logout();
+        await dispatch(logout());
         onClose();
     };
 

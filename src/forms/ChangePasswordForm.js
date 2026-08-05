@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { MdVisibility, MdVisibilityOff, MdCheck, MdError } from 'react-icons/md';
-import { useAuth } from '../context/AuthContext';
+import { useAppDispatch, useCurrentUser } from '../store/hooks';
+import { changePassword, verifyEmail } from '../store/slices/authSlice';
 import styles from '../styles/SettingsModal.module.css';
 import VerifyEmailForm from './VerifyEmailForm';
 
 const ChangePasswordForm = ({ onCancel, onSuccess }) => {
-    // Додаємо verifyEmail з вашого AuthContext
-    const { changePassword, verifyEmail, currentUser } = useAuth();
+    const dispatch = useAppDispatch();
+    const currentUser = useCurrentUser();
 
     const [formData, setFormData] = useState({
         oldPassword: '',
@@ -59,12 +60,15 @@ const ChangePasswordForm = ({ onCancel, onSuccess }) => {
         setError('');
 
         try {
-            const result = await changePassword(formData.oldPassword, formData.newPassword);
-            if (result.success) {
+            const resultAction = await dispatch(changePassword({ 
+                oldPassword: formData.oldPassword, 
+                newPassword: formData.newPassword 
+            }));
+            if (changePassword.fulfilled.match(resultAction)) {
                 setSuccess('Verification code sent to your email address');
                 setStep(2);
             } else {
-                setError(result.message);
+                setError(resultAction.payload || 'Failed to change password');
             }
         } catch (err) {
             setError('Error while chaneging password');
@@ -77,15 +81,18 @@ const ChangePasswordForm = ({ onCancel, onSuccess }) => {
         setIsLoading(true);
         setError('');
 
-        const result = await verifyEmail(currentUser.email, code);
+        const resultAction = await dispatch(verifyEmail({ 
+            email: currentUser.email, 
+            code 
+        }));
 
         setIsLoading(false);
 
-        if (result.success) {
+        if (verifyEmail.fulfilled.match(resultAction)) {
             setSuccess('Paswsword changed successfully');
             setTimeout(() => onSuccess && onSuccess(), 1500);
         } else {
-            setError(result.message);
+            setError(resultAction.payload || 'Verification failed');
         }
     };
 

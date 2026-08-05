@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
-import { useAuth } from '../context/AuthContext';
+import { useAppDispatch } from '../store/hooks';
+import { googleLogin } from '../store/slices/authSlice';
+import { setShowLoginForm } from '../store/slices/uiSlice';
 
-const GoogleAuthButton = () => {
-    const { googleLogin } = useAuth();
+const GoogleAuthButton = ({ onSuccess, onClose }) => {
+    const dispatch = useAppDispatch();
     const [errorMsg, setErrorMsg] = useState(null);
 
     const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
@@ -12,14 +14,20 @@ const GoogleAuthButton = () => {
         setErrorMsg(null);
         const idToken = credentialResponse.credential;
 
-        const result = await googleLogin(idToken);
+        const resultAction = await dispatch(googleLogin(idToken));
 
-        if (result.success) {
+        if (googleLogin.fulfilled.match(resultAction)) {
             console.log("Login with Google successfully!");
-            // Тут ти можеш зробити редірект, наприклад:
-            // navigate('/dashboard');
+            if (onSuccess) {
+                onSuccess(resultAction.payload?.user);
+            }
+            if (onClose) {
+                onClose();
+            } else {
+                dispatch(setShowLoginForm(false));
+            }
         } else {
-            setErrorMsg(result.message);
+            setErrorMsg(resultAction.payload);
         }
     };
 

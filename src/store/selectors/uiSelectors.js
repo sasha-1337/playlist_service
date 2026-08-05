@@ -1,0 +1,9 @@
+export const selectFilter = (state) => state.ui.filter;
+export const selectDrawerOpen = (state) => state.ui.drawerOpen;
+export const selectAlbumForm = (state) => state.ui.albumForm;
+export const selectSongForm = (state) => state.ui.songForm;
+export const selectSingleForm = (state) => state.ui.singleForm;
+export const selectShowAISearch = (state) => state.ui.showAISearch;
+export const selectShowModelComparison = (state) => state.ui.showModelComparison;
+export const selectShowLoginForm = (state) => state.ui.showLoginForm;
+export const selectShowRegisterForm = (state) => state.ui.showRegisterForm;

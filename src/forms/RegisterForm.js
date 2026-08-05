@@ -199,7 +199,8 @@
 
 import React, { useState } from 'react';
 import styles from '../styles/RegisterForm.module.css';
-import { useAuth } from '../context/AuthContext';
+import { useAppDispatch } from '../store/hooks';
+import { register, verifyEmail } from '../store/slices/authSlice';
 import VerifyEmailForm from './VerifyEmailForm';
 
 function RegisterForm({ onClose, onSuccess }) {
@@ -218,8 +219,7 @@ function RegisterForm({ onClose, onSuccess }) {
     const [isLoading, setIsLoading] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
 
-    // Достаємо новий метод з контексту
-    const { register, verifyEmail } = useAuth();
+    const dispatch = useAppDispatch();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -258,29 +258,29 @@ function RegisterForm({ onClose, onSuccess }) {
         setSuccessMessage('');
         setErrors({});
 
-        const result = await register(
-            formData.username,
-            formData.email,
-            formData.password,
-            formData.confirmPassword
-        );
+        const resultAction = await dispatch(register({
+            username: formData.username,
+            email: formData.email,
+            password: formData.password,
+            confirmPassword: formData.confirmPassword
+        }));
 
         setIsLoading(false);
 
-        if (result.success) {
+        if (register.fulfilled.match(resultAction)) {
+            const result = resultAction.payload;
             // Перемикаємо на форму вводу коду
             setStep(2);
             setSuccessMessage(result.message || 'Code sent to your email!');
         } else {
-            setErrors({ submit: result.message });
+            // rejection handling
+            setErrors({ submit: resultAction.payload?.message || resultAction.error?.message || 'Registration failed' });
         }
     };
 
     // Обробка Кроку 2
-    const handleVerifySubmit = async (e) => {
-        e.preventDefault();
-
-        if (!verificationCode.trim()) {
+    const handleVerifySubmit = async (code) => {
+        if (!code || !code.trim()) {
             setErrors({ submit: 'Please enter the verification code' });
             return;
         }
@@ -288,19 +288,22 @@ function RegisterForm({ onClose, onSuccess }) {
         setIsLoading(true);
         setErrors({});
 
-        const result = await verifyEmail(formData.email, verificationCode);
+        const resultAction = await dispatch(verifyEmail({ email: formData.email, code }));
 
         setIsLoading(false);
 
-        if (result.success) {
-            setSuccessMessage('Registration completed successfully! Redirecting...');
-            setTimeout(() => {
-                if (onSuccess) onSuccess(result);
-            }, 1500);
+        if (verifyEmail.fulfilled.match(resultAction)) {
+            const result = resultAction.payload;
+            setSuccessMessage('Registration completed successfully!');
+
+            if (onSuccess) onSuccess(result);
+            if (onClose) onClose();
+
         } else {
-            setErrors({ submit: result.message });
+            setErrors({ submit: resultAction.payload });
         }
     };
+
 
     return (
         <div className={styles.registerFormContainer}>

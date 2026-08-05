@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { MdVisibility, MdVisibilityOff, MdWarning, MdCheck, MdError } from 'react-icons/md';
-import { useAuth } from '../context/AuthContext';
+import { useAppDispatch, useCurrentUser } from '../store/hooks';
+import { removeAccount, verifyEmail, logout } from '../store/slices/authSlice';
 import styles from '../styles/SettingsModal.module.css';
 import VerifyEmailForm from './VerifyEmailForm';
 
 const DeleteAccountConfirm = ({ onCancel, onSuccess }) => {
-    const { currentUser, removeAccount, verifyEmail, logout} = useAuth();
+    const dispatch = useAppDispatch();
+    const currentUser = useCurrentUser();
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [confirmText, setConfirmText] = useState('');
@@ -38,11 +40,11 @@ const DeleteAccountConfirm = ({ onCancel, onSuccess }) => {
         setSuccess('');
 
         try {
-            const result = await removeAccount(password);
-            if (result.success) {   
+            const resultAction = await dispatch(removeAccount({ password }));
+            if (removeAccount.fulfilled.match(resultAction)) {   
                 setStep(2);
             } else {
-                setError(result.message || 'Failed to delete account');
+                setError(resultAction.payload || 'Failed to delete account');
             }
         } catch (error) {
             setError(error.message || 'Error request');
@@ -61,16 +63,19 @@ const DeleteAccountConfirm = ({ onCancel, onSuccess }) => {
         setError('');
 
         try {
-            const result = await verifyEmail(currentUser.email, code);
+            const resultAction = await dispatch(verifyEmail({ 
+                email: currentUser.email, 
+                code 
+            }));
 
-            if (result.success) {
+            if (verifyEmail.fulfilled.match(resultAction)) {
                 setSuccess('Account deleted successfully! Redirecting...');
-                logout();
+                dispatch(logout());
                 setTimeout(() => {
-                    if (onSuccess) onSuccess(result);
+                    if (onSuccess) onSuccess(resultAction.payload);
                 }, 1500);
             } else {
-                setError(result.message || 'Verification failed');
+                setError(resultAction.payload || 'Verification failed');
             }
         } catch (err) {
             setError('Connection error');

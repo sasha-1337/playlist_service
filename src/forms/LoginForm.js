@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import styles from '../styles/LoginForm.module.css';
-//import AuthService from '../services/AuthService';
-import { useAuth } from '../context/AuthContext';
 import GoogleAuthButton from '../components/GoogleAuthButton';
+import { useAppDispatch } from '../store/hooks';
+import { login } from '../store/slices/authSlice';
 
 function LoginForm({ onClose, onSuccess }) {
-    const { login } = useAuth();
+    const dispatch = useAppDispatch();
 
     const [formData, setFormData] = useState({
         email: '',
@@ -58,25 +58,26 @@ function LoginForm({ onClose, onSuccess }) {
         setIsLoading(true);
         setSuccessMessage('');
 
-        const result = await login(
-            formData.email,
-            formData.password
-        );
+        const resultAction = await dispatch(login({
+            email: formData.email,
+            password: formData.password
+        }));
 
         setIsLoading(false);
 
-        if (result.success) {
-            setSuccessMessage('Login successful! Redirecting...');
-            setTimeout(() => {
-                //login(result.user);
-                if (onSuccess) {
-                    onSuccess(result.user);
-                    window.location.href = '/';
-                }
+        if (login.fulfilled.match(resultAction)) {
+            const result = resultAction.payload;
+            setSuccessMessage('Login successful!');
+
+            if (onSuccess) {
+                onSuccess(result.user);
+            }
+            if (onClose) {
                 onClose();
-            }, 1500); 
+            }
+
         } else {
-            setErrors({ submit: result.message });
+            setErrors({ submit: resultAction.payload });
         }
     };
 
@@ -127,15 +128,15 @@ function LoginForm({ onClose, onSuccess }) {
                     </div>
 
                     <div className={styles.buttonContainer}>
-                        <button 
-                            type="submit" 
+                        <button
+                            type="submit"
                             disabled={isLoading}
                             className={styles.submitButton}
                         >
                             {isLoading ? 'Signing in...' : 'Sign In'}
                         </button>
-                        <button 
-                            type="button" 
+                        <button
+                            type="button"
                             onClick={onClose}
                             disabled={isLoading}
                             className={styles.cancelButton}
@@ -150,7 +151,7 @@ function LoginForm({ onClose, onSuccess }) {
                 </div>
 
                 <div className={styles.googleAuthContainer}>
-                    <GoogleAuthButton />
+                    <GoogleAuthButton onSuccess={onSuccess} onClose={onClose} />
                 </div>
             </div>
         </div>
