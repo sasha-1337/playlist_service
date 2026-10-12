@@ -1,7 +1,7 @@
 import axios from 'axios';
 import authService from '../services/AuthService';
 
-// Axios instance for authenticated API requests
+// Axios instance for backend API requests (:5000)
 const apiClient = axios.create({
     baseURL: process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api',
     headers: {
@@ -9,64 +9,65 @@ const apiClient = axios.create({
     },
 });
 
-// Axios instance for auth service (no interceptors, prevents circular token refresh loop)
-const authClient = axios.create({
-    baseURL: process.env.REACT_APP_AUTH_SERVICE_API_URL || 'http://localhost:5000/api',
-    headers: {
-        'Content-Type': 'application/json',
-    },
-});
+// Fallback alias for backward compatibility
+const authClient = apiClient;
 
-// Request Interceptor: add the token
+// Request Interceptor: attach Clerk session token
 apiClient.interceptors.request.use(
-    (config) => {
-        const token = authService.getToken();
+    async (config) => {
+        let token = null;
+
+        // 1. Отримуємо свіжий токен з поточної активної сесії Clerk
+        if (typeof window !== 'undefined' && window.Clerk?.session) {
+            try {
+                token = await window.Clerk.session.getToken();
+                if (token) {
+                    authService.setClerkToken(token);
+                }
+            } catch (err) {
+                console.warn('⚠️ [apiClient] Failed to fetch token from window.Clerk.session:', err);
+                token = authService.getClerkToken();
+            }
+        } else {
+            token = authService.getClerkToken();
+        }
+
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
+
         return config;
     },
     (error) => Promise.reject(error)
 );
 
-let refreshPromise = null;
-
-// Response Interceptor: handle 401/403
+// Response Interceptor: handle 401/403 with Clerk session token refresh
 apiClient.interceptors.response.use(
     (response) => response,
     async (error) => {
         const originalRequest = error.config;
-        
-        // Ensure we only retry once by using a custom flag, and only on 401/403
+
         if (error.response && (error.response.status === 401 || error.response.status === 403) && !originalRequest._retry) {
             originalRequest._retry = true;
 
-            if (!refreshPromise) {
-                refreshPromise = authService.refreshToken().then((result) => {
-                    refreshPromise = null;
-                    if (!result.success) {
-                        authService.clearLocalStorage();
-                        window.dispatchEvent(new Event('auth:unauthorized'));
-                        return Promise.reject(new Error('Session expired'));
+            // Примусово оновлюємо токен сесії Clerk (skipCache: true)
+            if (typeof window !== 'undefined' && window.Clerk?.session) {
+                try {
+                    const newToken = await window.Clerk.session.getToken({ skipCache: true });
+                    if (newToken) {
+                        authService.setClerkToken(newToken);
+                        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+                        return apiClient(originalRequest);
                     }
-                    return result.data?.token || result.token;
-                }).catch((err) => {
-                    refreshPromise = null;
-                    authService.clearLocalStorage();
-                    window.dispatchEvent(new Event('auth:unauthorized'));
-                    return Promise.reject(err);
-                });
+                } catch (clerkErr) {
+                    console.error('❌ [apiClient] Clerk session refresh failed:', clerkErr);
+                }
             }
 
-            try {
-                const newToken = await refreshPromise;
-                // Update the original request header with the new token
-                originalRequest.headers.Authorization = `Bearer ${newToken}`;
-                // Retry the request
-                return apiClient(originalRequest);
-            } catch (err) {
-                return Promise.reject(err);
-            }
+            // Якщо токен не вдалося оновити — очищаємо та сповіщаємо додаток
+            authService.setClerkToken(null);
+            window.dispatchEvent(new Event('auth:unauthorized'));
+            return Promise.reject(error);
         }
 
         return Promise.reject(error);

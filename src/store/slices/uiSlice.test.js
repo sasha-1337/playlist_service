@@ -15,6 +15,8 @@ describe('uiSlice', () => {
         singleForm: null,
         showAISearch: false,
         showModelComparison: false,
+        showLoginForm: false,
+        showRegisterForm: false,
     };
 
     it('returns initial state', () => {

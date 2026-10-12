@@ -1,216 +1,274 @@
-﻿/* ==========================================================
+/* ==========================================================
    ShowText.module.css
-   
-   Desktop: два блоки поряд (60% lyrics + 40% description)
-   Mobile:  вкладки (Lyrics / Info) — одна панель за раз,
-            без горизонтального скролу і фіксованих висот
+   Modern Glassmorphism Design
    ========================================================== */
-
-/* ── Container ───────────────────────────────────────────── */
 
 .commonContainer {
     position: relative;
     width: 100%;
     height: 100%;
     display: flex;
-    flex-direction: row;
-    gap: 15px;
+    flex-direction: column;
+    gap: 20px;
     box-sizing: border-box;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 8px;
+    padding-bottom: 24px;
 }
 
-/* ── Lyrics Panel ────────────────────────────────────────── */
-
-.lyricsContainer {
-    flex: 0 0 60%;
-    min-width: 0;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    padding: 15px;
+.commonContainer::-webkit-scrollbar {
+    width: 6px;
+}
+.commonContainer::-webkit-scrollbar-track {
+    background: transparent;
+}
+.commonContainer::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
     border-radius: 10px;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
 }
 
-.lyrics {
-    flex: 1;
-    color: white;
-    font-size: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-start;
+/* ── Hero Section ────────────────────────────────────────── */
+
+.hero {
+    position: relative;
+    width: 100%;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     overflow: hidden;
-    min-height: 0;
+    display: flex;
+    align-items: flex-end;
+    padding: 30px;
+    min-height: 250px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease;
+    flex-shrink: 0;
 }
 
-/* ── Description Panel ───────────────────────────────────── */
+.heroBackground {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    filter: blur(20px) brightness(0.6);
+    transform: scale(1.1);
+    z-index: 0;
+}
 
-.descriptionContainer {
-    flex: 0 0 40%;
-    min-width: 0;
-    height: 100%;
-    background-color: rgba(255, 255, 255, 0.3);
-    padding: 15px;
-    border-radius: 10px;
-    box-sizing: border-box;
+.heroContent {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    gap: 24px;
+    align-items: flex-end;
+    width: 100%;
+}
+
+.heroCover {
+    width: 180px;
+    height: 180px;
+    border-radius: 12px;
+    box-shadow: 0 12px 24px rgba(0,0,0,0.4);
+    object-fit: cover;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    flex-shrink: 0;
+}
+
+.heroText {
+    flex: 1;
     display: flex;
     flex-direction: column;
+    gap: 8px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
 }
 
-.description {
-    flex: 1;
+.heroType {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.heroTitle {
+    font-size: clamp(32px, 4vw, 56px);
+    font-weight: 800;
+    margin: 0;
     color: white;
+    line-height: 1.1;
+    font-family: 'Inter', sans-serif;
+}
+
+.heroSubtitle {
     font-size: 18px;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+}
+
+.badges {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-start;
-    overflow: hidden;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.badge {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: white;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ── Content Grid ────────────────────────────────────────── */
+
+.contentGrid {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: 20px;
+    flex: 1;
     min-height: 0;
 }
 
-/* ── Text Content ────────────────────────────────────────── */
+.glassCard {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    height: 100%;
+}
+
+.cardTitle {
+    font-size: 20px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 12px;
+}
+
+.scrollContent {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 12px;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 16px;
+    line-height: 1.8;
+}
+
+.scrollContent::-webkit-scrollbar {
+    width: 6px;
+}
+.scrollContent::-webkit-scrollbar-track {
+    background: transparent;
+}
+.scrollContent::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.2);
+    border-radius: 10px;
+}
 
 .textBlock {
     white-space: pre-wrap;
     word-wrap: break-word;
-    overflow-wrap: break-word;
     word-break: break-word;
-    line-height: 1.6;
 }
 
-/* ── Scrollable wrapper ──────────────────────────────────── */
-
-.scrollContent {
-    width: 100%;
+.emptyState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     height: 100%;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding-right: 8px;
-    box-sizing: border-box;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 18px;
+    text-align: center;
+    padding: 40px;
 }
 
-    .scrollContent::-webkit-scrollbar {
-        width: 8px;
-    }
-
-    .scrollContent::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    .scrollContent::-webkit-scrollbar-thumb {
-        background: rgba(255,255,255,0.55);
-        border-radius: 4px;
-    }
-
-        .scrollContent::-webkit-scrollbar-thumb:hover {
-            background: rgba(255,255,255,0.9);
-        }
-
-/* ── Mobile Tab Bar ──────────────────────────────────────── */
-/* Ховаємо на desktop */
-.tabBar {
-    display: none;
+.vinylRecord {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #222 30%, #000 70%);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+    animation: spin 4s linear infinite;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
 }
 
-.tabPanel {
-    display: none;
+.vinylCenter {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e74c3c;
+    border: 4px solid #111;
 }
 
-/* ── Responsive ──────────────────────────────────────────── */
+@keyframes spin {
+    100% { transform: rotate(360deg); }
+}
+
+/* ── Mobile Responsive ───────────────────────────────────── */
+
+@media (max-width: 900px) {
+    .contentGrid {
+        grid-template-columns: 1fr;
+    }
+}
 
 @media (max-width: 768px) {
-    /*
-     * На мобільному замість двох колонок — вкладки.
-     * Стандартні панелі ховаємо, показуємо tab-версію.
-     */
     .commonContainer {
+        gap: 14px;
+        padding-right: 4px;
+        padding-bottom: max(36px, env(safe-area-inset-bottom, 24px));
+    }
+
+    .hero {
+        padding: 16px;
+        min-height: auto;
+        border-radius: 16px;
+    }
+    
+    .heroContent {
         flex-direction: column;
-        gap: 0;
-        height: 100%;
-        overflow: hidden;
+        align-items: center;
+        text-align: center;
+        gap: 12px;
+    }
+    
+    .heroCover {
+        width: 110px;
+        height: 110px;
+        border-radius: 10px;
     }
 
-    /* Ховаємо desktop панелі */
-    .lyricsContainer,
-    .descriptionContainer {
-        display: none;
+    .heroTitle {
+        font-size: 28px;
+    }
+    
+    .badges {
+        justify-content: center;
     }
 
-    /* Tab bar */
-    .tabBar {
-        display: flex;
-        flex-shrink: 0;
-        border-bottom: 1px solid rgba(255,255,255,0.2);
-        margin-bottom: 0;
+    .contentGrid {
+        gap: 14px;
     }
-
-    .tabButton {
-        flex: 1;
-        padding: 12px 8px;
-        background: rgba(0,0,0,0.5);
-        border: none;
-        border-bottom: 3px solid transparent;
-        color: rgba(255,255,255,0.55);
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        transition: color 0.2s, border-color 0.2s, background 0.2s;
-    }
-
-        .tabButton:hover {
-            color: rgba(255,255,255,0.85);
-            background: rgba(255,255,255,0.05);
-        }
-
-        .tabButton.tabActive {
-            color: #ffffff;
-            border-bottom-color: #ffffff;
-            background: rgba(255,255,255,0.08);
-        }
-
-    /* Tab panels */
-    .tabPanel {
-        display: none;
-        flex: 1;
-        min-height: 0;
-        overflow: hidden;
-        padding: 14px 12px;
-        box-sizing: border-box;
-    }
-
-        .tabPanel.tabPanelActive {
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Lyrics tab */
-        .tabPanel.lyricsPanel {
-            background: rgba(0,0,0,0.7);
-            border-radius: 0 0 10px 10px;
-            color: white;
-            font-size: 17px;
-        }
-
-        /* Info tab */
-        .tabPanel.infoPanel {
-            background: rgba(255,255,255,0.25);
-            border-radius: 0 0 10px 10px;
-            color: white;
-            font-size: 16px;
-        }
-}
-
-@media (max-width: 480px) {
-    .tabButton {
-        font-size: 13px;
-        padding: 10px 6px;
-    }
-
-    .tabPanel {
-        padding: 12px 10px;
+    
+    .glassCard {
+        padding: 16px;
+        border-radius: 16px;
     }
 }

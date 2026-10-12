@@ -31,8 +31,8 @@ import {
 } from '../store/slices/uiSlice';
 
 const activeStyleHeader = css`
-    box-shadow: 0 0 40px rgba(255, 255, 255, 0.7) inset;
-    border: 8px solid rgba(255, 255, 255, 1);
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.35) inset, 0 4px 18px rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 1) !important;
     color: rgba(255, 255, 255, 1);
 `;
 
@@ -42,7 +42,8 @@ const activeBtnStyle = css`
 `;
 
 const activeStyleSong = css`
-    border: 5px solid rgba(255, 255, 255, 1);
+    border: 2px solid rgba(255, 255, 255, 1) !important;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
     color: rgba(255, 255, 255, 1);
 `;
 
@@ -125,29 +126,50 @@ const LibraryPanel = () => {
 
     return (
         <>
-            <div className="button-group">
-                <GeniusSearch />
-                <button
-                    onClick={() => dispatch(openAlbumForm('add'))}
-                    className="add-button"
-                >
-                    Add Album
-                </button>
-                <button
-                    className="add-button"
-                    onClick={() => dispatch(openSingleForm('add'))}
-                >
-                    Add Single
-                </button>
-                <select
-                    value={filter}
-                    className="select"
-                    onChange={(e) => dispatch(setFilter(e.target.value))}
-                >
-                    <option value="all">All</option>
-                    <option value="albums">Albums</option>
-                    <option value="singles">Singles</option>
-                </select>
+            <div className="library-controls">
+                <div className="search-section">
+                    <GeniusSearch />
+                </div>
+                
+                <div className="library-actions">
+                    <div className="filter-pills">
+                        <button 
+                            className={`filter-pill ${filter === 'all' ? 'active' : ''}`}
+                            onClick={() => dispatch(setFilter('all'))}
+                        >
+                            All
+                        </button>
+                        <button 
+                            className={`filter-pill ${filter === 'albums' ? 'active' : ''}`}
+                            onClick={() => dispatch(setFilter('albums'))}
+                        >
+                            Albums
+                        </button>
+                        <button 
+                            className={`filter-pill ${filter === 'singles' ? 'active' : ''}`}
+                            onClick={() => dispatch(setFilter('singles'))}
+                        >
+                            Singles
+                        </button>
+                    </div>
+
+                    <div className="add-buttons">
+                        <button
+                            onClick={() => dispatch(openAlbumForm('add'))}
+                            className="icon-add-button"
+                            title="Add Album"
+                        >
+                            + Album
+                        </button>
+                        <button
+                            onClick={() => dispatch(openSingleForm('add'))}
+                            className="icon-add-button"
+                            title="Add Single"
+                        >
+                            + Single
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <div className="content-container">

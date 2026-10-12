@@ -1,5 +1,5 @@
 .auth-header {
-    /* Абсолютне позиціонування відносно .logo-header (position: relative) */
+    /* Абсолютне позиціонування відносно .logo-header / .app-header */
     position: absolute;
     top: 50%;
     right: 20px;
@@ -10,8 +10,19 @@
     padding: 0;
     background: transparent;
     color: white;
-    /* z-index вищий за .logo-header (10) щоб dropdown не обрізався */
+    /* z-index вищий за хедер щоб dropdown не обрізався */
     z-index: 20;
+}
+
+.clerk-user-menu-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.clerk-user-menu-wrapper .cl-userButtonBox {
+    display: flex;
+    align-items: center;
 }
 
 .user-info {

@@ -1,4 +1,4 @@
-﻿import express from "express";
+import express from "express";
 import mongoose from "mongoose";
 import multer from "multer";
 import cors from "cors";
@@ -15,14 +15,28 @@ const UPLOAD_DIR = process.env.UPLOAD_DIR || "uploads";
 const GENIUS_TOKEN = process.env.GENIUS_ACCESS_TOKEN;
 
 const app = express();
-app.use(cors());
+const allowedOrigins = process.env.CORS_ORIGIN
+    ? process.env.CORS_ORIGIN.split(',').map((s) => s.trim())
+    : ['http://localhost:3000', 'https://localhost:3000'];
+
+app.use(cors({
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Blocked by CORS'));
+        }
+    },
+    methods: process.env.CORS_METHODS || 'GET,POST,PUT,DELETE,OPTIONS',
+    credentials: process.env.CORS_CREDENTIALS === 'true',
+}));
 app.use(express.json());
 
 app.use('/api/uploads', express.static('uploads'));
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, "uploads/"); 
+        cb(null, "uploads/");
     },
     filename: (req, file, cb) => {
         cb(null, Date.now() + "-" + file.originalname);
@@ -94,75 +108,75 @@ app.get("/api/items", authenticateToken, async (req, res) => {
         console.log(`✅ [Items] Items fetched successfully for user ${userId}`);
     } catch (error) {
         console.error("❌ [Items] Error fetching items:", error);
-       res.status(500).json({ error: "Failed to fetch items" });
-   }
+        res.status(500).json({ error: "Failed to fetch items" });
+    }
 });
 
 // GET albums (for current user)
 app.get("/api/albums", authenticateToken, async (req, res) => {
-   try {
-       const userId = req.user.sub;
-       if (!userId) {
-           console.warn("⚠️ [Auth] User ID not found in token.");
-           return res.status(401).json({ error: "Unauthorized" });
-       }
+    try {
+        const userId = req.user.sub;
+        if (!userId) {
+            console.warn("⚠️ [Auth] User ID not found in token.");
+            return res.status(401).json({ error: "Unauthorized" });
+        }
 
-       const albums = await Album.find({ userId });
+        const albums = await Album.find({ userId });
 
-       res.json(albums);
-       console.log(`✅ [Albums] Albums ${albums.length} fetched successfully for user ${userId}`);
-   } catch (error) {
-       console.error("❌ [Albums] Error fetching albums:", error);
-       res.status(500).json({ error: "Failed to fetch albums" });
-   }
+        res.json(albums);
+        console.log(`✅ [Albums] Albums ${albums.length} fetched successfully for user ${userId}`);
+    } catch (error) {
+        console.error("❌ [Albums] Error fetching albums:", error);
+        res.status(500).json({ error: "Failed to fetch albums" });
+    }
 });
 
 // GET songs in album
 app.get("/api/albums/:id/songs", authenticateToken, async (req, res) => {
-   try {
-       const userId = req.user.sub;
-       if (!userId) {
-           console.warn("⚠️ [Auth] User ID not found in token.");
-           return res.status(401).json({ error: "Unauthorized" });
-       }
+    try {
+        const userId = req.user.sub;
+        if (!userId) {
+            console.warn("⚠️ [Auth] User ID not found in token.");
+            return res.status(401).json({ error: "Unauthorized" });
+        }
 
-       const album = await Album.findById(req.params.id);
+        const album = await Album.findById(req.params.id);
 
-       if (!album) {
-           console.warn(`⚠️ [Songs] Album ${req.params.id} not found.`);
-           return res.status(404).json({ error: "Album not found" });
-       }
+        if (!album) {
+            console.warn(`⚠️ [Songs] Album ${req.params.id} not found.`);
+            return res.status(404).json({ error: "Album not found" });
+        }
 
-       if (album.userId !== userId) {
-           console.warn(`🔒 [Auth] Attempted unauthorized access to the album ${album.name}.`);
-           return res.status(403).json({ error: "Access denied" });
-       }
+        if (album.userId !== userId) {
+            console.warn(`🔒 [Auth] Attempted unauthorized access to the album ${album.name}.`);
+            return res.status(403).json({ error: "Access denied" });
+        }
 
-       res.json(album);
-       console.log(`✅ [Songs] Songs ${album.songs.length} fetched successfully for user ${userId}`);
-   } catch (error) {
-       console.error("❌ [Songs] Error fetching album songs:", error);
-       res.status(500).json({ error: "Failed to fetch album songs" });
-   }
+        res.json(album);
+        console.log(`✅ [Songs] Songs ${album.songs.length} fetched successfully for user ${userId}`);
+    } catch (error) {
+        console.error("❌ [Songs] Error fetching album songs:", error);
+        res.status(500).json({ error: "Failed to fetch album songs" });
+    }
 });
 
 // GET singles (for current user)
 app.get("/api/singles", authenticateToken, async (req, res) => {
-   try {
-       const userId = req.user.sub;
+    try {
+        const userId = req.user.sub;
 
-       if (!userId) {
-           console.warn("⚠️ [Auth] User ID not found in token.");
-           return res.status(401).json({ error: "Unauthorized" });
-       }
+        if (!userId) {
+            console.warn("⚠️ [Auth] User ID not found in token.");
+            return res.status(401).json({ error: "Unauthorized" });
+        }
 
-       const singles = await Single.find({ userId });
-       res.json(singles);
-       console.log(`✅ [Singles] Singles ${singles.length} fetched successfully for user ${userId}`);
-   } catch (error) {
-       console.error("❌ [Singles] Error fetching singles:", error);
-       res.status(500).json({ error: "Failed to fetch singles" });
-   }
+        const singles = await Single.find({ userId });
+        res.json(singles);
+        console.log(`✅ [Singles] Singles ${singles.length} fetched successfully for user ${userId}`);
+    } catch (error) {
+        console.error("❌ [Singles] Error fetching singles:", error);
+        res.status(500).json({ error: "Failed to fetch singles" });
+    }
 });
 
 // POST new album ${ UPLOAD_URL }
@@ -192,7 +206,7 @@ app.post("/api/albums", authenticateToken, upload.single("coverImage"), async (r
         console.error("❌ [Albums] Failed to create new album: ", err);
         res.status(500).json({ error: "Failed to create album" });
     }
-}); 
+});
 
 // POST new song to album
 app.post("/api/albums/:id/songs", authenticateToken, async (req, res) => {
@@ -236,7 +250,7 @@ app.post("/api/singles", authenticateToken, upload.single("coverImage"), async (
         } else {
             newSingle.coverImage = null;
         }
-        
+
         await newSingle.save();
         res.json(newSingle);
         console.log("✅ [Singles] New single created: ", newSingle.name, " for user: ", userId);
@@ -367,7 +381,7 @@ app.put("/api/singles/:id", authenticateToken, upload.single("coverImage"), asyn
         } else if (req.body.coverImage) {
             single.coverImage = req.body.coverImage;
         }
-        
+
         await single.save();
         res.json(single);
         console.log("🔄 [Singles] Single updated successfully: ", single.name, " for user: ", userId);
@@ -616,11 +630,11 @@ mongoose.connect(process.env.MONGO_URI)
     .catch(err => console.error("❌ MongoDB error:", err));
 
 // --- Start server ---
-const PORT = process.env.PORT;
-if (process.env.NODE_ENV === "test") {
+const PORT = process.env.PORT || 5000;
+if (process.env.NODE_ENV !== "test") {
     app.listen(PORT, () => {
         console.log(`🚀 Server running on http://localhost:${PORT}`);
-        console.log(`📝 Environment: ${process.env.NODE_ENV}`);
+        console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
     });
 }
 

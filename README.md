@@ -1,169 +1,72 @@
-# 🎵 Playlist Service - Full Stack Music Library Management
+# 🎵 Playlist Manager
 
-> **A complete full-stack application for managing, organizing, and discovering music with AI-powered search capabilities.**
----
+<p align="center">
+  <img src="https://img.shields.io/badge/React-19.0-61DAFB?logo=react&logoColor=black" alt="React 19" />
+  <img src="https://img.shields.io/badge/Redux_Toolkit-2.12-764ABC?logo=redux&logoColor=white" alt="Redux Toolkit" />
+  <img src="https://img.shields.io/badge/Clerk-Authentication-6C47FF?logo=clerk&logoColor=white" alt="Clerk Auth" />
+  <img src="https://img.shields.io/badge/Express-5.1-000000?logo=express&logoColor=white" alt="Express" />
+  <img src="https://img.shields.io/badge/MongoDB-Mongoose_8.19-47A248?logo=mongodb&logoColor=white" alt="MongoDB" />
+  <img src="https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white" alt="Node.js" />
+  <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License" />
+</p>
 
-## 📋 Table of Contents
-
-- [Overview](#-overview)
-- [Features](#-features)
-- [Architecture](#-architecture)
-- [Tech Stack](#-tech-stack)
-- [Project Structure](#-project-structure)
-- [Getting Started](#-getting-started)
-- [Installation](#-installation)
-- [Configuration](#-configuration)
-- [Running the Application](#-running-the-application)
-- [API Documentation](#-api-documentation)
-- [Development](#-development)
-- [Contributing](#-contributing)
-- [License](#-license)
+A state-of-the-art, full-stack music playlist and album library management application built with **React 19**, **Redux Toolkit**, **Node.js/Express**, and **MongoDB**, featuring seamless cloud authentication powered by **Clerk** and a modern glassmorphic dark interface.
 
 ---
 
-## 🎯 Overview
+## 🌿 Repository Branches & Architecture
 
-**Playlist Service** is an enterprise-grade music library management system that allows users to:
+This repository is maintained in two distinct branches showcasing evolution from a custom authentication microservice to enterprise-grade cloud authentication:
 
-- Create and organize **Albums** and **Singles** with metadata
-- Add, edit, and manage **Songs** within collections
-- Upload and process **album covers** with advanced image cropping
-- Integrate **multiple music providers** (YouTube, Spotify, SoundCloud)
-- Authenticate securely with **Google OAuth** and local credentials
-- Search music using **AI-powered search** with model comparison
-- Manage user accounts with **JWT-based authentication**
-
-The system follows **clean architecture** principles with a microservices-inspired design, featuring separate services for authentication, music data, and AI operations.
+| Branch | Authentication Strategy | Backend Stack | Notes |
+| :--- | :--- | :--- | :--- |
+| **`clerk-auth`** *(Current)* | **Clerk Cloud Auth** (RS256 JWT, Passkeys, Social, Session Tokens) | Express 5.x + `@clerk/express` + MongoDB | Cloud-native, zero-maintenance auth with JWKS verification and responsive UI. |
+| **`main`** / `legacy-auth` | **Custom Microservice** (`PlaylistService.Auth` in ASP.NET Core) | .NET 8 + SQL Server + Custom JWT + Mailtrap | Legacy architecture with custom password hashing, refresh tokens, and email verification. |
 
 ---
 
 ## ✨ Features
 
-### 🎼 Music Library Management
-- ✅ **CRUD Operations** for Albums, Singles, and Songs
-- ✅ **Nested Structure** - Albums contain Songs, each with metadata
-- ✅ **Media Links** - Attach YouTube, Spotify, SoundCloud links to songs
-- ✅ **Cover Images** - Upload and crop album artwork with advanced image processing
-- ✅ **Rich Metadata** - Genre, description, lyrics, creation dates
-
-### 🔐 Authentication & Security
-- ✅ **Google OAuth 2.0** - Seamless third-party authentication
-- ✅ **JWT Tokens** - Secure, stateless authentication
-- ✅ **Refresh Tokens** - Extended session management
-- ✅ **Email Verification** - Confirm user identity before activation
-- ✅ **Password Hashing** - ASP.NET Identity password security
-- ✅ **Protected Routes** - Role-based access control
-
-### 🤖 AI & Search Capabilities
-- ✅ **AI-Powered Search** - Semantic music search with machine learning
-- ✅ **Model Comparison** - Compare multiple AI models for search accuracy
-- ✅ **Genius API Integration** - Fetch lyrics and song information
-- ✅ **Smart Filtering** - Filter by genre, creator, date, and more
-
-### 🖼️ Image Processing
-- ✅ **Image Upload** - Drag-and-drop file upload with validation
-- ✅ **Advanced Cropping** - Interactive crop tool with preview
-- ✅ **Format Conversion** - Automatic image optimization
-- ✅ **Local & CDN Storage** - Flexible storage options
-
-### 📱 User Experience
-- ✅ **Responsive Design** - Works on desktop, tablet, and mobile
-- ✅ **Draggable Components** - Interactive UI elements
-- ✅ **Real-time Updates** - Instant feedback on changes
-- ✅ **Dark/Light Theme** - Styled Components for theming
-- ✅ **Mobile Navigation** - Adaptive menu for small screens
-
----
-
-## 🏗️ Architecture
-
-### Microservices Architecture
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    Frontend (React 19)                       │
-│          Single Page Application with Hooks & Context        │
-└────────────────────┬────────────────────────────────────────┘
-					 │
-		┌────────────┼────────────┬──────────────┐
-		│            │            │              │
-		▼            ▼            ▼              ▼
-	┌─────────┐ ┌────────┐ ┌──────────┐ ┌─────────┐
-	│  Auth   │ │ Music  │ │   AI     │ │ Upload  │
-	│Service  │ │Service │ │ Service  │ │ Service │
-	│(.NET 10)│ │(Node)  │ │(Python)  │ │(Node)   │
-	└────┬────┘ └───┬────┘ └────┬─────┘ └────┬────┘
-		 │          │           │            │
-		 ▼          ▼           ▼            ▼
-	┌──────────────────────────────────────────┐
-	│      Databases & External Services       │
-	│  - SQL Server (Auth)                     │
-	│  - MongoDB (Music Data)                  │
-	│  - Google OAuth                          │
-	│  - Genius API                            │
-	│  - File Storage (uploads/)               │
-	└──────────────────────────────────────────┘
-```
-
-### Design Patterns Used
-
-| Pattern | Usage | File |
-|---------|-------|------|
-| **Layered Architecture** | Clear separation of concerns | Controllers → Services → Data |
-| **Dependency Injection** | Automatic dependency management | `Program.cs` (DI Container) |
-| **Strategy Pattern** | Dynamic operation handling | `RegisterStrategy`, `ChangePasswordStrategy` |
-| **DTO Pattern** | Data validation & API contracts | `DTOs/` folder |
-| **Repository Pattern** | Data access abstraction | Entity Framework Core |
-| **Custom Hooks** | State logic reusability | `useMusicLibrary`, `useAuth` |
-| **Context API** | Global state management | `AuthContext` |
-| **Component Composition** | Reusable UI components | Forms, Components folders |
+- 🔐 **Clerk Cloud Authentication:**
+  - One-click modal sign-in & sign-up (Email, Social, Google, Passkeys).
+  - Interactive profile management with `<UserButton />`.
+  - Automatic session token acquisition, client-side retry, and token refresh.
+  - Asymmetric RS256 token verification on Express backend with automatic JWKS caching.
+- 💿 **Comprehensive Music Library:**
+  - Create, view, edit, and delete **Albums** and **Singles**.
+  - Dynamic song management within albums (add tracks, edit metadata, lyrics).
+  - Image upload support for album and single cover artwork via **Multer**.
+- 🔍 **Genius API Integration:**
+  - Real-time search across songs and albums with cover artwork thumbnails.
+  - Quick import of track metadata and lyrics.
+- 🎨 **Glassmorphism Dark UI & UX:**
+  - Modern aesthetic with backdrop blur filters, glowing borders, and smooth transitions.
+  - Ergonomic 400px desktop library sidebar and adaptive track viewer.
+  - Fully responsive mobile drawer navigation with zero layout overlap.
+  - Safe-area inset support for modern mobile browsers.
+- 🤖 **AI Assistant & Semantic Search:**
+  - Integrated natural language song and album discovery service.
 
 ---
 
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **React 19.0** - Modern UI library with hooks
-- **React Bootstrap 2.10** - Responsive UI components
-- **Styled Components 6.1** - CSS-in-JS styling
-- **React Image Crop 11.0** - Advanced image cropping
-- **Croppie 2.6** - Alternative image manipulation
-- **React Icons 5.4** - Comprehensive icon library
-- **React Player 3.4** - Media playback
-- **React Draggable 4.5** - Drag-and-drop components
-- **React OAuth/Google 0.13** - Google authentication
-- **lodash.debounce** - Performance optimization
+- **Framework:** React 19 (`react`, `react-dom`)
+- **State Management:** Redux Toolkit (`@reduxjs/toolkit`, `react-redux`)
+- **Authentication:** Clerk React SDK (`@clerk/react`)
+- **Styling:** Vanilla CSS & CSS Modules, Styled Components, Bootstrap 5 utilities
+- **Icons:** `react-icons` (Material Icons, FontAwesome)
+- **HTTP Client:** Axios with custom request/response interceptors
 
-### Backend Services
-
-#### Authentication Service (ASP.NET Core .NET 10)
-- **Entity Framework Core** - ORM for database operations
-- **JWT Bearer Authentication** - Token-based auth
-- **Microsoft.AspNetCore.Identity** - Password hashing
-- **Google.Apis.Auth** - Google OAuth integration
-- **DotNetEnv** - Environment variable management
-- **SQL Server** - Primary database
-
-#### Music Service (Node.js/Express)
-- **Express.js** - Web framework
-- **Mongoose** - MongoDB object modeling
-- **Multer** - File upload handling
-- **CORS** - Cross-origin resource sharing
-- **dotenv** - Environment configuration
-- **MongoDB** - NoSQL database
-
-#### AI Service (Python)
-- **FastAPI** or similar - API framework
-- **TensorFlow/PyTorch** - ML model inference
-- **scikit-learn** - Machine learning algorithms
-- **Requests** - HTTP client for external APIs
-
-### Developer Tools
-- **Visual Studio 2026** - .NET IDE
-- **Visual Studio Code** - Multi-purpose editor
-- **npm** - JavaScript package manager
-- **Git** - Version control
-- **Docker** *(optional)* - Containerization
+### Backend
+- **Runtime:** Node.js (ES Modules)
+- **Framework:** Express 5.x
+- **Authentication:** `@clerk/express`, `jsonwebtoken`, Node `crypto`
+- **Database:** MongoDB via Mongoose 8.x
+- **File Uploads:** Multer with local disk storage
+- **CORS:** Configured with credentials support for local & production environments
+- **Testing:** Jest, Supertest
 
 ---
 
@@ -171,640 +74,146 @@ The system follows **clean architecture** principles with a microservices-inspir
 
 ```
 my-react-app/
-├── 📂 src/                          # Frontend (React)
-│   ├── App.js                       # Main application component
-│   ├── index.js                     # Entry point
-│   ├── 📂 components/               # Reusable UI components
-│   │   ├── ImageHandler.js          # Image upload & crop
-│   │   ├── AuthContainer.js         # Authentication wrapper
-│   │   ├── ProtectedRoute.js        # Route protection
-│   │   ├── GeniusSearch.js          # Genius API search
-│   │   └── ...
-│   ├── 📂 forms/                    # Form components
-│   │   ├── AlbumForm.js             # Album create/edit
-│   │   ├── SongForm.js              # Song create/edit
-│   │   ├── SingleForm.js            # Single create/edit
-│   │   ├── ChangePasswordForm.js    # Password change
-│   │   └── ...
-│   ├── 📂 ai-components/            # AI-related components
-│   │   ├── AISearch.js              # AI-powered search
-│   │   └── ModelComparison.js       # AI model comparison
-│   ├── 📂 context/                  # Global state (Context API)
-│   │   ├── AuthContext.js           # Authentication state
-│   │   └── ...
-│   ├── 📂 hooks/                    # Custom React hooks
-│   │   ├── useMusicLibrary.js       # Music data management
-│   │   ├── useAuth.js               # Authentication hook
-│   │   └── ...
-│   ├── 📂 styles/                   # CSS & styled components
-│   │   ├── App.css
-│   │   ├── ImageHandler.css
-│   │   └── ...
-│   └── 📂 utils/                    # Helper functions
-│       └── ...
-│
-├── 📂 backend/                      # Node.js Express Server
-│   ├── server.js                    # Express app setup
-│   ├── models.js                    # MongoDB schemas
-│   ├── 📂 middleware/
-│   │   ├── authMiddleware.js        # JWT verification
-│   │   └── ...
-│   ├── 📂 routes/                   # API endpoints
-│   │   └── ...
-│   ├── 📂 controllers/              # Business logic
-│   │   └── ...
-│   ├── 📂 ai-service/
-│   │   ├── ai_search.py             # AI search implementation
-│   │   └── requirements.txt         # Python dependencies
-│   ├── uploads/                     # Cover image storage
-│   ├── .env.example                 # Environment template
-│   └── package.json
-│
-├── 📂 PlaylistService.Auth/         # ASP.NET Core Auth Service
-│   ├── Program.cs                   # Configuration & startup
-│   ├── 📂 Controllers/
-│   │   └── AuthController.cs        # Auth endpoints
-│   ├── 📂 Services/
-│   │   ├── AuthService.cs           # Auth business logic
-│   │   ├── TokenService.cs          # JWT generation
-│   │   ├── EmailService.cs          # Email verification
-│   │   └── IAuthService.cs          # Service interface
-│   ├── 📂 Strategy/
-│   │   ├── IAuthStrategy.cs         # Strategy interface
-│   │   ├── RegisterStrategy.cs      # Registration logic
-│   │   ├── ChangePasswordStrategy.cs
-│   │   └── RemoveAccountStrategy.cs
-│   ├── 📂 Models/
-│   │   ├── User.cs                  # User entity
-│   │   ├── JwtSettings.cs           # JWT configuration
-│   │   └── GoogleSettings.cs        # Google OAuth config
-│   ├── 📂 DTOs/                     # Data transfer objects
-│   │   ├── RegisterDto.cs
-│   │   ├── LoginDto.cs
-│   │   ├── ChangePasswordDto.cs
-│   │   └── ...
-│   ├── 📂 Data/
-│   │   ├── AuthDbContext.cs         # EF Core context
-│   │   └── 📂 Migrations/           # Database migrations
-│   ├── 📂 Properties/
-│   │   └── launchSettings.json      # Debug settings
-│   ├── appsettings.json             # Configuration
-│   ├── appsettings.Development.json # Dev-specific config
-│   ├── .env.example                 # Environment template
-│   ├── README.md                    # Service documentation
-│   └── PlaylistService.Auth.csproj  # Project file
-│
-├── 📂 public/                       # Static files
-│   ├── index.html
-│   ├── favicon.ico
-│   └── ...
-│
-├── package.json                     # Frontend dependencies
-├── .gitignore                       # Git exclusions
-├── .env.example                     # Root environment template
-└── README.md                        # This file
+├── backend/
+│   ├── middleware/
+│   │   └── authMiddleware.js      # Clerk session verification (SDK + JWKS RS256)
+│   ├── models.js                  # Mongoose models (Album, Single, Song)
+│   ├── server.js                  # Express API server & route handlers
+│   ├── server.test.js             # Automated API controller test suite
+│   ├── package.json
+│   └── .env.example               # Backend environment template
+├── src/
+│   ├── ai-components/             # AI Search & Model comparison widgets
+│   ├── components/
+│   │   ├── AuthContainer.js       # Clerk UI integration & Redux session sync
+│   │   ├── GeniusSearch.js        # Live Genius API search
+│   │   ├── LibraryPanel.js        # Albums and singles collection sidebar
+│   │   ├── ProtectedRoute.js      # Clerk auth gate wrapper
+│   │   └── ShowText.js            # Glassmorphic track viewer & vinyl player
+│   ├── forms/                     # Album, Single, and Song modal forms
+│   ├── store/
+│   │   ├── index.js               # Redux store configuration
+│   │   ├── hooks.js               # Typed Redux hooks
+│   │   └── slices/                # authSlice, librarySlice, selectionSlice, uiSlice
+│   ├── styles/                    # Component & global CSS stylesheets
+│   ├── utils/
+│   │   └── apiClient.js           # Axios client with Clerk Bearer token interceptor
+│   ├── App.js                     # Root layout, header, drawer, and footer
+│   └── index.js                   # Application entrypoint with ClerkProvider
+├── .env.example                   # Frontend environment template
+├── .gitignore                     # Git ignore rules (protects all .env & secrets)
+└── README.md
 ```
 
 ---
 
 ## 🚀 Getting Started
 
-### Prerequisites
+### 1. Prerequisites
+- **Node.js** (v18.x or higher)
+- **MongoDB** running locally on port `27017` or a MongoDB Atlas connection string
+- A free **Clerk** account at [clerk.com](https://clerk.com)
 
-- **Node.js** 16+ (for frontend & backend services)
-- **npm** 8+ (JavaScript package manager)
-- **.NET SDK 10** (for ASP.NET Core auth service)
-- **SQL Server** (LocalDB or full install)
-- **MongoDB** (local or cloud Atlas)
-- **Git** (version control)
-- **Python 3.9+** *(optional, for AI service)*
-
-### System Requirements
-
-- **RAM**: 4GB minimum, 8GB recommended
-- **Disk Space**: 2GB for dependencies
-- **OS**: Windows 10+, macOS, or Linux
-
----
-
-## 💾 Installation
-
-### 1. Clone the Repository
+### 2. Clone the Repository
 
 ```bash
 git clone https://github.com/sasha-1337/playlist_service.git
-cd my-react-app
+cd playlist_service
+git checkout clerk-auth
 ```
 
-### 2. Install Frontend Dependencies
+### 3. Setup Environment Variables
+
+#### Frontend (`.env` in project root)
+Copy `.env.example` to `.env`:
 
 ```bash
-npm install
+cp .env.example .env
 ```
 
-### 3. Install Backend Service Dependencies
+Configure your Clerk Publishable Key:
+```env
+REACT_APP_API_BASE_URL=http://localhost:5000/api
+REACT_APP_API_PORT=5000
+REACT_APP_CLERK_PUBLISHABLE_KEY=pk_test_your_clerk_publishable_key_here
+REACT_APP_AI_API_URL=http://localhost:5001/api/ai
+```
+
+#### Backend (`backend/.env`)
+Copy `backend/.env.example` to `backend/.env`:
 
 ```bash
 cd backend
-npm install
-cd ..
+cp .env.example .env
 ```
 
-### 4. Set Up Authentication Service
-
-```bash
-cd PlaylistService.Auth
-dotnet restore
-```
-
-### 5. *(Optional)* Set Up Python AI Service
-
-```bash
-cd backend/ai-service
-pip install -r requirements.txt
-cd ../..
-```
-
----
-
-## ⚙️ Configuration
-
-### Frontend Configuration
-
-Create a `.env` file in the root directory:
-
+Configure your backend secrets:
 ```env
-# === BACKEND URLS ===
-REACT_APP_API_URL=http://localhost:5000
-REACT_APP_AUTH_SERVICE_URL=http://localhost:5001
-REACT_APP_AI_SERVICE_URL=http://localhost:8000
-
-# === GOOGLE OAUTH ===
-REACT_APP_GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
-
-# === GENIUS API ===
-REACT_APP_GENIUS_ACCESS_TOKEN=your-genius-token
-
-# === DEVELOPMENT ===
-REACT_APP_DEBUG=true
-```
-
-### Backend (Node.js) Configuration
-
-Create `backend/.env`:
-
-```env
-# === DATABASE ===
-MONGODB_URI=mongodb://localhost:27017/playlist_service
-# Or MongoDB Atlas:
-# MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/playlist_service
-
-# === SERVER ===
+SERVER_URL=http://localhost:5000/api
 PORT=5000
-SERVER_URL=http://localhost:5000
 NODE_ENV=development
+MONGO_URI=mongodb://localhost:27017/musicdb
 
-# === CORS ===
-CORS_ORIGIN=http://localhost:3000,http://localhost:3001
+CLERK_PUBLISHABLE_KEY=pk_test_your_clerk_publishable_key_here
+CLERK_SECRET_KEY=sk_test_your_clerk_secret_key_here
 
-# === AUTH SERVICE ===
-AUTH_SERVICE_URL=http://localhost:5001
-JWT_SECRET=your-jwt-secret-key
-
-# === GENIUS API ===
-GENIUS_ACCESS_TOKEN=your-genius-api-token
-
-# === FILE UPLOADS ===
-UPLOAD_DIR=uploads
-MAX_FILE_SIZE=5242880
+GENIUS_ACCESS_TOKEN=your_genius_access_token_here
 ```
 
-### Authentication Service (.NET) Configuration
-
-Create `PlaylistService.Auth/.env`:
-
-```env
-# === DATABASE ===
-ConnectionStrings__DefaultConnection=Server=(localdb)\mssqllocaldb;Database=PlaylistServiceAuthDb;Trusted_Connection=true;
-
-# === JWT ===
-Jwt__SecretKey=your-super-secret-key-minimum-32-characters-long!!!
-Jwt__Issuer=PlaylistService
-Jwt__Audience=PlaylistServiceClients
-
-# === GOOGLE OAUTH ===
-Google__ClientId=your-google-client-id.apps.googleusercontent.com
-Google__ClientSecret=your-google-client-secret
-
-# === SERVER ===
-ASPNETCORE_ENVIRONMENT=Development
-ASPNETCORE_URLS=https://localhost:7001;http://localhost:5001
-
-# === CORS ===
-AllowedOrigins=http://localhost:3000,http://localhost:3001
-```
-
-### Database Setup
-
-#### MongoDB (Music Service)
+### 4. Install Dependencies
 
 ```bash
-# Option 1: Local MongoDB
-# Start MongoDB server on localhost:27017
-
-# Option 2: MongoDB Atlas (Cloud)
-# Update MONGODB_URI in backend/.env with your connection string
-```
-
-#### SQL Server (Auth Service)
-
-```bash
-# Create migrations (from PlaylistService.Auth directory)
-cd PlaylistService.Auth
-dotnet ef migrations add InitialCreate
-dotnet ef database update
-cd ..
-```
-
----
-
-## ▶️ Running the Application
-
-### Development Mode
-
-#### Terminal 1: Frontend (React)
-
-```bash
-npm start
-```
-
-Runs on: `http://localhost:3000`
-
-#### Terminal 2: Backend Service (Node.js)
-
-```bash
-cd backend
-npm start
-```
-
-Runs on: `http://localhost:5000`
-
-#### Terminal 3: Authentication Service (.NET)
-
-```bash
-cd PlaylistService.Auth
-dotnet run
-```
-
-Runs on: `https://localhost:7001`
-
-#### Terminal 4: *(Optional)* AI Service (Python)
-
-```bash
-cd backend/ai-service
-python main.py
-```
-
-Runs on: `http://localhost:8000`
-
-### Production Build
-
-```bash
-# Frontend
-npm run build
-
-# Backend
-# Prepare Node service for production deployment
-
-# Auth Service
-dotnet publish -c Release
-
-# AI Service
-# Containerize with Docker for production
-```
-
----
-
-## 📡 API Documentation
-
-### Authentication Service (ASP.NET Core)
-
-**Base URL**: `https://localhost:7001/api/auth`
-
-#### Register User
-```http
-POST /api/auth/register
-Content-Type: application/json
-
-{
-  "email": "user@example.com",
-  "username": "john_doe",
-  "password": "SecurePassword123",
-  "confirmPassword": "SecurePassword123"
-}
-```
-
-#### Login
-```http
-POST /api/auth/login
-Content-Type: application/json
-
-{
-  "email": "user@example.com",
-  "password": "SecurePassword123"
-}
-```
-
-#### Google OAuth Login
-```http
-POST /api/auth/google-login-oauth
-Content-Type: application/json
-
-{
-  "credential": "google-id-token"
-}
-```
-
-#### Verify Email
-```http
-POST /api/auth/verify-email
-Content-Type: application/json
-
-{
-  "email": "user@example.com",
-  "code": "123456"
-}
-```
-
-#### Change Password
-```http
-POST /api/auth/change-password
-Authorization: Bearer {jwt-token}
-Content-Type: application/json
-
-{
-  "oldPassword": "OldPassword123",
-  "newPassword": "NewPassword123",
-  "confirmPassword": "NewPassword123"
-}
-```
-
-### Music Service (Node.js)
-
-**Base URL**: `http://localhost:5000/api`
-
-#### Get All Albums
-```http
-GET /api/albums
-Authorization: Bearer {jwt-token}
-```
-
-#### Create Album
-```http
-POST /api/albums
-Authorization: Bearer {jwt-token}
-Content-Type: application/json
-
-{
-  "name": "Album Name",
-  "creator": "Artist Name",
-  "genre": "Genre",
-  "description": "Album description",
-  "coverImage": "image-url"
-}
-```
-
-#### Get Album by ID
-```http
-GET /api/albums/:id
-Authorization: Bearer {jwt-token}
-```
-
-#### Update Album
-```http
-PUT /api/albums/:id
-Authorization: Bearer {jwt-token}
-Content-Type: application/json
-
-{
-  "name": "Updated Name",
-  ...
-}
-```
-
-#### Delete Album
-```http
-DELETE /api/albums/:id
-Authorization: Bearer {jwt-token}
-```
-
-#### Add Song to Album
-```http
-POST /api/albums/:id/songs
-Authorization: Bearer {jwt-token}
-Content-Type: application/json
-
-{
-  "name": "Song Name",
-  "lyrics": "Song lyrics",
-  "description": "Song description",
-  "media": [
-	{
-	  "provider": "youtube",
-	  "url": "https://youtube.com/..."
-	}
-  ]
-}
-```
-
-#### Upload Cover Image
-```http
-POST /api/upload
-Authorization: Bearer {jwt-token}
-Content-Type: multipart/form-data
-
-file: [binary image data]
-```
-
-### AI Search Service (Python)
-
-**Base URL**: `http://localhost:8000/api`
-
-#### AI Search
-```http
-POST /api/search/ai
-Authorization: Bearer {jwt-token}
-Content-Type: application/json
-
-{
-  "query": "upbeat rock songs",
-  "model": "semantic-search",
-  "limit": 10
-}
-```
-
-#### Compare Models
-```http
-POST /api/search/compare
-Authorization: Bearer {jwt-token}
-Content-Type: application/json
-
-{
-  "query": "sad piano music",
-  "models": ["model1", "model2", "model3"]
-}
-```
-
----
-
-## 🔧 Development
-
-### Code Style & Conventions
-
-- **JavaScript/React**: ES6+, camelCase naming, Functional Components with Hooks
-- **C# (.NET)**: PascalCase, async/await, SOLID principles
-- **Python**: PEP 8, snake_case, type hints (optional)
-
-### Running Tests
-
-```bash
-# Frontend tests
-npm test
-
-# Backend tests
-cd backend
-npm test
-cd ..
-
-# .NET tests
-cd PlaylistService.Auth
-dotnet test
-cd ..
-```
-
-### Git Workflow
-
-```bash
-# Create feature branch
-git checkout -b feature/your-feature-name
-
-# Commit with conventional commits
-git commit -m "feat: add album filtering"
-
-# Push to remote
-git push origin feature/your-feature-name
-
-# Create Pull Request on GitHub
-```
-
-### Environment & Debug
-
-**Frontend Debug Mode:**
-```javascript
-// Set REACT_APP_DEBUG=true in .env
-if (process.env.REACT_APP_DEBUG) {
-  console.log('Debug mode enabled');
-}
-```
-
-**Backend Debug Mode:**
-```bash
-# Node.js
-node --inspect server.js
-
-# .NET
-dotnet run --configuration Debug
-```
-
----
-
-## 🐛 Troubleshooting
-
-### Frontend Issues
-
-**Port 3000 already in use:**
-```bash
-npm start -- --port 3001
-```
-
-**CORS errors:**
-- Ensure `AllowedOrigins` includes your frontend URL in `.env`
-- Check that backend services are running
-
-**Authentication token expired:**
-- Use refresh token endpoint
-- Log in again to get new token
-
-### Backend Issues
-
-**MongoDB connection failed:**
-- Ensure MongoDB is running: `mongod`
-- Check `MONGODB_URI` in `.env`
-
-**JWT secret key error in .NET:**
-- Generate new key: 
-```powershell
-[System.Convert]::ToBase64String([System.Security.Cryptography.RandomNumberGenerator]::GetBytes(32))
-```
-- Update `Jwt__SecretKey` in `.env`
-
-**Port already in use:**
-```bash
-# Find process using port
-netstat -ano | findstr :5000
-
-# Kill process (replace PID)
-taskkill /PID <PID> /F
-```
-
-### General Issues
-
-**Dependencies not installed:**
-```bash
-# Clear cache and reinstall
-rm -rf node_modules package-lock.json
+# Install frontend dependencies (in root)
 npm install
+
+# Install backend dependencies
+cd backend
+npm install
+cd ..
 ```
 
-**Database migrations failed:**
+### 5. Run the Application
+
+#### Start Backend Server
 ```bash
-# Rollback migration
-cd PlaylistService.Auth
-dotnet ef migrations remove
-# Fix issues and try again
+cd backend
+npm start
+# Server starts on http://localhost:5000
+```
+
+#### Start Frontend Client
+```bash
+# In a separate terminal in project root
+npm start
+# Client starts on http://localhost:3000
 ```
 
 ---
 
-## 👨‍💻 Author
+## 🔒 Security & Environment Protection
 
-**Sasha** - [GitHub Profile](https://github.com/sasha-1337)
-
----
-
-## 🙏 Acknowledgments
-
-- React documentation and community
-- ASP.NET Core best practices
-- MongoDB documentation
-- Google OAuth developers
-- Genius API team
-- All open-source libraries used in this project
+- 🛡️ **Zero Hardcoded Secrets:** All credentials, private tokens, and connection strings are strictly managed via environment variables.
+- 🚫 **Strict Git Ignore:** All `.env`, `.env.local`, `.env.*`, certificates, upload caches, and legacy `.NET` build artifacts (`PlaylistService.Auth/`, `bin/`, `obj/`) are excluded from version control.
+- 🔑 **Cryptographic Token Verification:** Backend verifies incoming tokens using Clerk's public JSON Web Key Sets (JWKS) via asymmetric RS256 algorithm. Expired or forged tokens are rejected immediately.
 
 ---
 
-## 📊 Project Stats
+## 🧪 Testing
 
-- **Frontend**: React 19 with 10+ custom components
-- **Backend**: 3 microservices (Node.js, .NET, Python)
-- **Database**: MongoDB + SQL Server
-- **API Endpoints**: 50+ endpoints
-- **Features**: 20+ major features
+Both frontend slices and backend API endpoints are covered with automated test suites:
+
+```bash
+# Run backend API controller tests
+cd backend
+npm test
+
+# Run frontend Redux slice tests
+cd ..
+npm test -- src/store/slices --watchAll=false
+```
 
 ---
 
-**Last Updated**: 2025  
-**Version**: 0.1.0  
-**Status**: Active Development
+## 📄 License
 
----
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.

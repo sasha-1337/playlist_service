@@ -60,3 +60,10 @@ obj/
 *.tmp
 .cache/
 *.bak
+
+# Legacy ASP.NET Auth Microservice
+PlaylistService.Auth/
+playlistservice.auth/
+
+# IDE / Editor configuration
+.vscode/

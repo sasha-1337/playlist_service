@@ -1,16 +1,14 @@
 import React from 'react';
-import { useAppSelector, useIsAuthenticated } from '../store/hooks';
-import { selectAuthIsLoading } from '../store/selectors/authSelectors';
+import { useAuth } from '@clerk/react';
 
 const ProtectedRoute = ({ children }) => {
-    const isAuthenticated = useIsAuthenticated();
-    const isLoading = useAppSelector(selectAuthIsLoading);
+    const { isLoaded, isSignedIn } = useAuth();
 
-    if (isLoading) {
+    if (!isLoaded) {
         return <div className="loading">Завантаження...</div>;
     }
 
-    if (!isAuthenticated) {
+    if (!isSignedIn) {
         return null;
     }
 

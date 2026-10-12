@@ -14,6 +14,7 @@ import AISearch from './ai-components/AISearch';
 import ModelComparison from './ai-components/ModelComparison';
 
 import { MdMenu, MdClose } from 'react-icons/md';
+import { FaGithub } from 'react-icons/fa';
 import { useAppDispatch, useAppSelector, useIsAuthenticated, useCurrentUser } from './store/hooks';
 import {
     fetchLibrary,
@@ -32,7 +33,6 @@ import {
     setSelectedSingle,
     setSelectedSong,
 } from './store/slices/selectionSlice';
-import { initAuth } from './store/slices/authSlice';
 import {
     setDrawerOpen,
     closeAlbumForm,
@@ -46,10 +46,6 @@ const App = () => {
     const isAuthenticated = useIsAuthenticated();
     const currentUser = useCurrentUser();
     const dispatch = useAppDispatch();
-
-    useEffect(() => {
-        dispatch(initAuth());
-    }, [dispatch]);
 
     const albums = useAppSelector((state) => state.library.albums);
     const selectedAlbum = useAppSelector((state) => state.selection.selectedAlbum);
@@ -145,6 +141,13 @@ const App = () => {
             <div className="app-background" />
 
             <header className="app-header">
+                <button
+                    className="drawer-toggle header-drawer-toggle"
+                    onClick={() => dispatch(setDrawerOpen(true))}
+                    aria-label="Відкрити меню"
+                >
+                    <MdMenu size={28} />
+                </button>
                 <div className="app-logo">Playlist Manager</div>
                 <AuthContainer />
             </header>
@@ -155,14 +158,6 @@ const App = () => {
                         <div className="container desktop-only">
                             <LibraryPanel />
                         </div>
-
-                        <button
-                            className="drawer-toggle"
-                            onClick={() => dispatch(setDrawerOpen(true))}
-                            aria-label="Відкрити меню"
-                        >
-                            <MdMenu size={28} />
-                        </button>
 
                         <div
                             className={`drawer-overlay ${drawerOpen ? 'drawer-overlay--visible' : ''}`}
@@ -227,7 +222,22 @@ const App = () => {
                 </ProtectedRoute>
             </main>
 
-            <footer className="app-footer" />
+            <footer className="app-footer">
+                <div className="footer-content">
+                    <span className="footer-title">Playlist Manager</span>
+                    <span className="footer-separator">•</span>
+                    <a
+                        href="https://github.com/sasha-1337/playlist_service"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="footer-github-link"
+                        title="GitHub Repository"
+                    >
+                        <FaGithub size={18} className="footer-github-icon" />
+                        <span>GitHub</span>
+                    </a>
+                </div>
+            </footer>
         </div>
     );
 };
