@@ -51,6 +51,7 @@ obj/
 .idea/
 
 # IDE
+.vscode/
 *.swp
 *.swo
 *~
