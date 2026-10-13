@@ -1,5 +1,10 @@
 # 🔐 PlaylistService.Auth — Сервіс Автентифікації (.NET 10)
 
+<p align="left">
+  <a href="README.en.md"><b>🇬🇧 English</b></a> | 
+  <a href="README.md"><b>🇺🇦 Українська</b></a>
+</p>
+
 > **Високопродуктивний мікросервіс автентифікації та управління користувачами на базі ASP.NET Core Web API, Entity Framework Core та SQL Server.**
 
 ---

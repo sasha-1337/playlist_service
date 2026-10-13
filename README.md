@@ -1,5 +1,10 @@
 # 🎵 Playlist Service — Full Stack Music Library Platform
 
+<p align="left">
+  <a href="README.en.md"><b>🇬🇧 English</b></a> | 
+  <a href="README.md"><b>🇺🇦 Українська</b></a>
+</p>
+
 [![React](https://img.shields.io/badge/React-19.0-61DAFB?logo=react&logoColor=black)](https://react.dev/)
 [![Redux Toolkit](https://img.shields.io/badge/Redux_Toolkit-2.12-764ABC?logo=redux&logoColor=white)](https://redux-toolkit.js.org/)
 [![ASP.NET Core](https://img.shields.io/badge/ASP.NET_Core-10.0-512BD4?logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
