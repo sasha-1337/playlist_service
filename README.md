@@ -1,5 +1,10 @@
 # 🎵 Playlist Manager
 
+<p align="left">
+  <a href="README.md"><b>🇬🇧 English</b></a> | 
+  <a href="README.uk.md"><b>🇺🇦 Українська</b></a>
+</p>
+
 <p align="center">
   <img src="https://img.shields.io/badge/React-19.0-61DAFB?logo=react&logoColor=black" alt="React 19" />
   <img src="https://img.shields.io/badge/Redux_Toolkit-2.12-764ABC?logo=redux&logoColor=white" alt="Redux Toolkit" />
